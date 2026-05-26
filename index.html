@@ -275,7 +275,6 @@
             margin-left: -10%;
             margin-top: -5%;
             text-align: justify;
-            /* 移除 text-heavy-shake 動畫，使其恢復靜止 */
         }
 
         /* 1.5秒選項閃爍變形動畫 */
@@ -568,17 +567,24 @@
                 targetBtn.classList.add('selected');
                 
                 if (index !== 0) {
+                    const labels = ['A. ', 'B. ', 'C. ', 'D. '];
+                    // 檢查是否已經完成過文字轉變。若已是「深信不疑」，則不再觸發震動
+                    if (targetBtn.innerText === labels[index] + "深信不疑") {
+                        document.getElementById('next-btn').disabled = false;
+                        return;
+                    }
+
                     document.getElementById('next-btn').disabled = true;
                     
+                    // 僅啟動震動效果，文字在此時完全不進行修改
                     targetBtn.classList.remove('item-shake-active');
                     void targetBtn.offsetWidth; 
                     targetBtn.classList.add('item-shake-active');
                     
+                    // 嚴格等待 0.4 秒（400ms）震動完全停止的瞬間，才改變文字並解鎖按鈕
                     setTimeout(() => {
                         targetBtn.classList.remove('item-shake-active');
-                        const labels = ['A. ', 'B. ', 'C. ', 'D. '];
                         targetBtn.innerText = labels[index] + "深信不疑";
-                        
                         document.getElementById('next-btn').disabled = false;
                     }, 400); 
                 } else {
@@ -600,7 +606,6 @@
                 }
 
                 const modalContent = document.getElementById('modal-content');
-                // 預設先移除紅字警告樣式
                 modalContent.classList.remove('warning-red');
 
                 if (q8WrongCount === 1) {
@@ -609,7 +614,6 @@
                 } else if (q8WrongCount === 2) {
                     document.body.classList.add('forced-dark');
                     modalContent.innerText = shouldShowHint ? hint : "為什麼？";
-                    // 核心調整：二次錯誤時加入紅字樣式類別
                     modalContent.classList.add('warning-red');
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount >= 3) {
@@ -652,7 +656,6 @@
 
         function closeModal() {
             document.getElementById('hint-modal').classList.add('hidden');
-            // 關閉彈窗時順便把紅字樣式清除以供後續重設
             document.getElementById('modal-content').classList.remove('warning-red');
             const currentData = questions[currentQuestionIndex];
             
