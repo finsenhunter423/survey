@@ -134,9 +134,6 @@
             background-color: #2b251f !important;
             color: #fbf8eb !important;
             border-color: #2b251f !important;
-            pointer-events: none;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         /* 選項禁用/反灰狀態 */
@@ -308,10 +305,16 @@
             animation: item-shake 0.4s ease-in-out;
         }
 
-        /* 第 11 題專用：被選中時文字變為紅色 */
+        /* 第 11 題專用：被觸發轉化時文字變為紅色，且在選中狀態下覆蓋白色字體 */
         .option-item.q11-revealed {
             color: #ff1a1a !important;
             border-color: #ff1a1a !important;
+        }
+        /* 當第 11 題已轉化的選項同時處於選中狀態時，維持古典選中底色，但字體改為淡紅以示區別 */
+        .option-item.selected.q11-revealed {
+            background-color: #2b251f !important;
+            color: #ff5555 !important;
+            border-color: #2b251f !important;
         }
 
         /* 網頁整體被迫黑化樣式 */
@@ -474,10 +477,10 @@
                 question: "11. 您聽說過關於沼澤的「故事」嗎？", 
                 isSpecialQ11: true,
                 options: [
-                    { initial: "……沒有", revealed: "Long long ago, a tale was born" },
-                    { initial: "聽過怪物的故事", revealed: "In the mist, monsters roam" },
-                    { initial: "聽過牙醫的故事", revealed: "A land of mystery, a hunting ground" },
-                    { initial: "聽過“牙醫”的故事", revealed: "Welcome to the dentist's swamp" }
+                    { initial: "……沒有", revealed: "Long long ago, a tale was born", hasRevealed: false },
+                    { initial: "聽過怪物的故事", revealed: "In the mist, monsters roam", hasRevealed: false },
+                    { initial: "聽過牙醫的故事", revealed: "A land of mystery, a hunting ground", hasRevealed: false },
+                    { initial: "聽過“牙醫”的故事", revealed: "Welcome to the dentist's swamp", hasRevealed: false }
                 ] 
             },
             { question: "12. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
@@ -660,16 +663,29 @@
             // 第 11 題特殊處理分支
             if (currentData.isSpecialQ11) {
                 selectedOptionIndex = index;
+                // 將當前點選的選項標記為已揭露狀態
+                currentData.options[index].hasRevealed = true;
+                
                 const items = document.querySelectorAll('.option-item');
                 const labels = ['A. ', 'B. ', 'C. ', 'D. '];
                 
                 items.forEach((item, idx) => {
-                    if (idx === index) {
-                        item.innerText = labels[idx] + currentData.options[idx].revealed;
-                        item.classList.add('selected', 'q11-revealed');
+                    const optData = currentData.options[idx];
+                    
+                    // 根據各選項獨立的狀態決定文字內容與樣式
+                    if (optData.hasRevealed) {
+                        item.innerText = labels[idx] + optData.revealed;
+                        item.classList.add('q11-revealed');
                     } else {
-                        item.innerText = labels[idx] + currentData.options[idx].initial;
-                        item.classList.remove('selected', 'q11-revealed');
+                        item.innerText = labels[idx] + optData.initial;
+                        item.classList.remove('q11-revealed');
+                    }
+                    
+                    // 處理選中外觀
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
                     }
                 });
                 
