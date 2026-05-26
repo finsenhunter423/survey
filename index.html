@@ -308,6 +308,12 @@
             animation: item-shake 0.4s ease-in-out;
         }
 
+        /* 第 11 題專用：被選中時文字變為紅色 */
+        .option-item.q11-revealed {
+            color: #ff1a1a !important;
+            border-color: #ff1a1a !important;
+        }
+
         /* 網頁整體被迫黑化樣式 */
         body.forced-dark {
             background-color: #0a0a0a !important;
@@ -463,7 +469,21 @@
             {
                 question: "10. 您是否接受過牙齒矯正？",
                 options: [{ text: "正在進行" }, { text: "曾經有" }, { text: "未來計畫進行" }, { text: "不曾且無計畫接受" }]
-            }
+            },
+            { 
+                question: "11. 您聽說過關於沼澤的「故事」嗎？", 
+                isSpecialQ11: true,
+                options: [
+                    { initial: "……沒有", revealed: "Long long ago, a tale was born" },
+                    { initial: "聽過怪物的故事", revealed: "In the mist, monsters roam" },
+                    { initial: "聽過牙醫的故事", revealed: "A land of mystery, a hunting ground" },
+                    { initial: "聽過“牙醫”的故事", revealed: "Welcome to the dentist's swamp" }
+                ] 
+            },
+            { question: "12. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
+            { question: "13. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
+            { question: "14. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
+            { question: "15. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] }
         ];
 
         questions[7].options[2].final = "也許不會";
@@ -499,7 +519,7 @@
             
             const currentData = questions[currentQuestionIndex];
             
-            document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 10`;
+            document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 15`;
             document.getElementById('question-text').innerText = currentData.question;
             
             const container = document.getElementById('options-container');
@@ -540,6 +560,15 @@
                     }, 800);
                 }
 
+            } else if (currentData.isSpecialQ11) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `opt-${index}`;
+                    btn.innerText = labels[index] + opt.initial;
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
             } else {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
@@ -625,6 +654,26 @@
                         loadQuestion(); 
                     }, 3000);
                 }
+                return;
+            }
+
+            // 第 11 題特殊處理分支
+            if (currentData.isSpecialQ11) {
+                selectedOptionIndex = index;
+                const items = document.querySelectorAll('.option-item');
+                const labels = ['A. ', 'B. ', 'C. ', 'D. '];
+                
+                items.forEach((item, idx) => {
+                    if (idx === index) {
+                        item.innerText = labels[idx] + currentData.options[idx].revealed;
+                        item.classList.add('selected', 'q11-revealed');
+                    } else {
+                        item.innerText = labels[idx] + currentData.options[idx].initial;
+                        item.classList.remove('selected', 'q11-revealed');
+                    }
+                });
+                
+                document.getElementById('next-btn').disabled = false;
                 return;
             }
 
