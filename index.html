@@ -487,15 +487,18 @@
                 question: "12. 您是否願意進入「診療室」", 
                 isSpecialQ12: true,
                 options: [
-                    { text: "願意" }, 
-                    { text: "願意" }, 
-                    { text: "願意" }, 
-                    { text: "願意" }
+                    { initial: "願意", final: "願意" }, 
+                    { initial: "需要考慮", final: "願意" }, 
+                    { initial: "不願意", final: "願意" }, 
+                    { initial: "堅定拒絕", final: "願意" }
                 ] 
             },
             { 
                 question: "13. 您願意接受口腔檢查嗎？", 
                 options: [
+                    { text: "願意" },
+                    { text: "願意" },
+                    { text: "願意" },
                     { text: "願意" }
                 ] 
             },
@@ -512,6 +515,9 @@
         let q8Timer = null;
         let q8TextsRevealed = false; 
         let disabledOptionsQ8 = [false, false, false, false];
+
+        let q12Timer = null;
+        let q12TextsRevealed = false;
         
         const triggeredHints = {};
 
@@ -591,6 +597,36 @@
                     btn.onclick = () => selectOption(index);
                     container.appendChild(btn);
                 });
+            } else if (currentData.isSpecialQ12) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `q12-opt-${index}`;
+                    
+                    if (q12TextsRevealed) {
+                        btn.innerText = labels[index] + opt.final;
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
+                    }
+                    
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+
+                if (!q12TextsRevealed) {
+                    q12Timer = setTimeout(() => {
+                        q12TextsRevealed = true;
+                        currentData.options.forEach((opt, index) => {
+                            const btn = document.getElementById(`q12-opt-${index}`);
+                            if (btn) {
+                                btn.classList.add('glitch-active');
+                                btn.innerText = labels[index] + opt.final;
+                                setTimeout(() => btn.classList.remove('glitch-active'), 250);
+                            }
+                        });
+                    }, 800);
+                }
+
             } else {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
@@ -777,6 +813,9 @@
             } else if (currentData.isSpecialQ8 && selectedOptionIndex === 0) {
                 document.body.classList.remove('forced-dark');
                 clearTimeout(q8Timer);
+                proceedToNext();
+            } else if (currentData.isSpecialQ12) {
+                clearTimeout(q12Timer);
                 proceedToNext();
             } else {
                 proceedToNext();
