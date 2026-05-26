@@ -264,12 +264,29 @@
             margin: 0;
         }
 
+        /* 第8題特殊效果：紅色滿版文字劇烈震動動畫 */
+        @keyframes text-heavy-shake {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-12px, 8px) rotate(-1deg); }
+            20% { transform: translate(14px, -9px) rotate(1deg); }
+            30% { transform: translate(-10px, -4px) rotate(-1.5deg); }
+            40% { transform: translate(13px, 9px) rotate(1.5deg); }
+            50% { transform: translate(-12px, 5px) rotate(-1deg); }
+            60% { transform: translate(11px, -7px) rotate(1deg); }
+            70% { transform: translate(-13px, 6px) rotate(-2deg); }
+            80% { transform: translate(12px, -4px) rotate(1.5deg); }
+            90% { transform: translate(-8px, 9px) rotate(-1deg); }
+            100% { transform: translate(0, 0); }
+        }
+
         .text-filler {
             width: 120%;
             height: 120%;
             margin-left: -10%;
             margin-top: -5%;
             text-align: justify;
+            /* 持續進行極其劇烈的震動 */
+            animation: text-heavy-shake 0.15s infinite linear;
         }
 
         /* 1.5秒選項閃爍變形動畫 */
@@ -285,7 +302,7 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
-        /* 第7題專用：單一選項短促震動動態效果 */
+        /* 第7題專用：單一選項短促震動動態效果（持續0.3秒） */
         @keyframes item-shake {
             0% { transform: translateX(0); }
             20% { transform: translateX(-6px); }
@@ -406,7 +423,7 @@
                 options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }]
             },
             {
-                question: "3. 您是否使用漱口水(Mouthwashes) As？",
+                question: "3. 您是否使用漱口水(Mouthwashes)？",
                 options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }]
             },
             {
@@ -549,7 +566,6 @@
                 selectedOptionIndex = index;
                 const items = document.querySelectorAll('.option-item');
                 
-                // 清除其餘選項狀態
                 items.forEach((item, idx) => {
                     if (idx !== index) item.classList.remove('selected');
                 });
@@ -558,31 +574,27 @@
                 targetBtn.classList.add('selected');
                 
                 if (index !== 0) {
-                    // 選 A 以外：先將下一題按鈕鎖定
                     document.getElementById('next-btn').disabled = true;
                     
-                    // 選項短促震動
+                    // 選項短促震動 (持續0.3秒)
                     targetBtn.classList.remove('item-shake-active');
-                    void targetBtn.offsetWidth; // 強制重繪
+                    void targetBtn.offsetWidth; 
                     targetBtn.classList.add('item-shake-active');
                     
-                    // 震動結束（300ms）後轉變文字，隨後解鎖按鈕
                     setTimeout(() => {
                         targetBtn.classList.remove('item-shake-active');
                         const labels = ['A. ', 'B. ', 'C. ', 'D. '];
                         targetBtn.innerText = labels[index] + "深信不疑";
                         
-                        // 轉變完成後才解鎖按鈕
                         document.getElementById('next-btn').disabled = false;
                     }, 300);
                 } else {
-                    // 選 A 正確選項：直接解鎖按鈕
                     document.getElementById('next-btn').disabled = false;
                 }
                 return;
             }
             
-            // 第 8 題選錯的分支（已完全刪除震動特效）
+            // 第 8 題選錯的分支（刪除原畫面震動，改為紅色滿版文字劇烈晃動）
             if (currentData.isSpecialQ8 && index !== 0) {
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
