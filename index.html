@@ -129,7 +129,7 @@
             border-color: #a1947b;
         }
 
-        /* 最佳化：被選中的選項樣式（禁止滑鼠事件與文字反白） */
+        /* 被選中的選項樣式 */
         .option-item.selected {
             background-color: #2b251f !important;
             color: #fbf8eb !important;
@@ -285,22 +285,17 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
-        /* 畫面劇烈震動動畫效果 */
-        @keyframes container-shake {
-            0% { transform: translate(0, 0); }
-            10% { transform: translate(-8px, 2px); }
-            20% { transform: translate(7px, -3px); }
-            30% { transform: translate(-6px, -1px); }
-            40% { transform: translate(8px, 3px); }
-            50% { transform: translate(-5px, 1px); }
-            60% { transform: translate(6px, -2px); }
-            70% { transform: translate(-7px, 2px); }
-            80% { transform: translate(5px, -1px); }
-            90% { transform: translate(-3px, 3px); }
-            100% { transform: translate(0, 0); }
+        /* 第7題專用：單一選項短促震動動態效果 */
+        @keyframes item-shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+            100% { transform: translateX(0); }
         }
-        .shake-active {
-            animation: container-shake 0.4s ease-in-out;
+        .item-shake-active {
+            animation: item-shake 0.3s ease-in-out;
         }
 
         /* 網頁整體被迫黑化樣式 */
@@ -344,7 +339,6 @@
 
     <div id="survey-container">
         
-        <!-- 標頭與引言區域 -->
         <div id="welcome-screen">
             <div class="header-section">
                 <h1>口腔健康與習慣調查</h1>
@@ -361,7 +355,6 @@
             </div>
         </div>
 
-        <!-- 題目互動區域 -->
         <div id="question-screen" class="hidden">
             <div class="content-section">
                 <div id="progress" class="progress-indicator"></div>
@@ -374,7 +367,6 @@
             </div>
         </div>
 
-        <!-- 結束區域 -->
         <div id="end-screen" class="hidden">
             <div class="header-section">
                 <h1>調查結束</h1>
@@ -387,7 +379,6 @@
 
     </div>
 
-    <!-- 特殊互動提示框 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -395,12 +386,10 @@
         </div>
     </div>
 
-    <!-- 全黑過場遮罩 -->
     <div id="blackout-screen" class="blackout-overlay hidden">
         <div id="blackout-content" class="blackout-text">這就對了</div>
     </div>
 
-    <!-- 第8題專用：滿版紅色處罰畫面（內嵌動態生成巨量文字） -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler" class="text-filler"></div>
     </div>
@@ -417,7 +406,7 @@
                 options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }]
             },
             {
-                question: "3. 您是否使用漱口水(Mouthwashes)？",
+                question: "3. 您是否使用漱口水(Mouthwashes) As？",
                 options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }]
             },
             {
@@ -493,15 +482,6 @@
             filler.innerText = txt;
         }
 
-        // 觸發畫面震動特效的通用函式
-        function triggerScreenShake() {
-            const container = document.getElementById('survey-container');
-            container.classList.remove('shake-active');
-            void container.offsetWidth; // 強制瀏覽器重繪，以重複觸發動畫
-            container.add('shake-active');
-            setTimeout(() => container.classList.remove('shake-active'), 400);
-        }
-
         function loadQuestion() {
             selectedOptionIndex = null;
             document.getElementById('next-btn').disabled = true;
@@ -536,7 +516,6 @@
                 });
 
                 if (!q8TextsRevealed) {
-                    // 最佳化：將開頭時長縮短至 0.8 秒（800毫秒）
                     q8Timer = setTimeout(() => {
                         q8TextsRevealed = true;
                         currentData.options.forEach((opt, index) => {
@@ -554,6 +533,7 @@
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
+                    btn.id = `opt-${index}`;
                     btn.innerText = labels[index] + opt.text;
                     btn.onclick = () => selectOption(index, opt.hint, opt.hintId);
                     container.appendChild(btn);
@@ -564,15 +544,46 @@
         function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
             
-            // 第 7 題選錯時（選 B, C, D）加入畫面震動
-            if (currentData.isSpecialQ7 && index !== 0) {
-                triggerScreenShake();
+            // 第 7 題特殊處理分支
+            if (currentData.isSpecialQ7) {
+                selectedOptionIndex = index;
+                const items = document.querySelectorAll('.option-item');
+                
+                // 清除其餘選項狀態
+                items.forEach((item, idx) => {
+                    if (idx !== index) item.classList.remove('selected');
+                });
+                
+                const targetBtn = document.getElementById(`opt-${index}`);
+                targetBtn.classList.add('selected');
+                
+                if (index !== 0) {
+                    // 選 A 以外：先將下一題按鈕鎖定
+                    document.getElementById('next-btn').disabled = true;
+                    
+                    // 選項短促震動
+                    targetBtn.classList.remove('item-shake-active');
+                    void targetBtn.offsetWidth; // 強制重繪
+                    targetBtn.classList.add('item-shake-active');
+                    
+                    // 震動結束（300ms）後轉變文字，隨後解鎖按鈕
+                    setTimeout(() => {
+                        targetBtn.classList.remove('item-shake-active');
+                        const labels = ['A. ', 'B. ', 'C. ', 'D. '];
+                        targetBtn.innerText = labels[index] + "深信不疑";
+                        
+                        // 轉變完成後才解鎖按鈕
+                        document.getElementById('next-btn').disabled = false;
+                    }, 300);
+                } else {
+                    // 選 A 正確選項：直接解鎖按鈕
+                    document.getElementById('next-btn').disabled = false;
+                }
+                return;
             }
             
-            // 第 8 題選錯的懲罰機制（包含畫面震動）
+            // 第 8 題選錯的分支（已完全刪除震動特效）
             if (currentData.isSpecialQ8 && index !== 0) {
-                triggerScreenShake(); // 只要選錯立即引發震動
-                
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
                 document.getElementById('next-btn').disabled = true;
@@ -604,15 +615,12 @@
                 return;
             }
 
+            // 一般題目點選邏輯
             selectedOptionIndex = index;
             const items = document.querySelectorAll('.option-item');
             items.forEach((item, idx) => {
                 if (idx === index) {
                     item.classList.add('selected');
-                    if (currentData.isSpecialQ7 && index > 0) {
-                        const labels = ['A. ', 'B. ', 'C. ', 'D. '];
-                        item.innerText = labels[index] + "深信不疑";
-                    }
                 } else {
                     item.classList.remove('selected');
                 }
