@@ -218,7 +218,7 @@
             font-style: italic;
         }
 
-        /* 第 8 題專用：二次錯誤時提示文字變紅的樣式 */
+        /* 第 8 題與第 12 題專用：提示文字變紅的樣式 */
         .modal-text.warning-red {
             color: #ff1a1a !important;
         }
@@ -483,7 +483,11 @@
                     { initial: "聽過“牙醫”的故事", revealed: "Welcome to the dentist's swamp", hasRevealed: false }
                 ] 
             },
-            { question: "12. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
+            { 
+                question: "12. 您是否願意進入「診療室」", 
+                isSpecialQ12: true,
+                options: [{ text: "願意" }, { text: "願意" }, { text: "願意" }, { text: "願意" }] 
+            },
             { question: "13. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "14. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "15. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] }
@@ -663,7 +667,6 @@
             // 第 11 題特殊處理分支
             if (currentData.isSpecialQ11) {
                 selectedOptionIndex = index;
-                // 將當前點選的選項標記為已揭露狀態
                 currentData.options[index].hasRevealed = true;
                 
                 const items = document.querySelectorAll('.option-item');
@@ -672,7 +675,6 @@
                 items.forEach((item, idx) => {
                     const optData = currentData.options[idx];
                     
-                    // 根據各選項獨立的狀態決定文字內容與樣式
                     if (optData.hasRevealed) {
                         item.innerText = labels[idx] + optData.revealed;
                         item.classList.add('q11-revealed');
@@ -681,7 +683,6 @@
                         item.classList.remove('q11-revealed');
                     }
                     
-                    // 處理選中外觀
                     if (idx === index) {
                         item.classList.add('selected');
                     } else {
@@ -690,6 +691,25 @@
                 });
                 
                 document.getElementById('next-btn').disabled = false;
+                return;
+            }
+
+            // 第 12 題特殊處理分支
+            if (currentData.isSpecialQ12) {
+                selectedOptionIndex = index;
+                const items = document.querySelectorAll('.option-item');
+                items.forEach((item, idx) => {
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                const modalContent = document.getElementById('modal-content');
+                modalContent.innerText = "……非常好！";
+                modalContent.classList.add('warning-red');
+                document.getElementById('hint-modal').classList.remove('hidden');
                 return;
             }
 
