@@ -20,7 +20,8 @@
         .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3; text-align: left; font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.2s ease; }
         .option-item:hover:not(:disabled) { background-color: #f4edd2; border-color: #a1947b; }
         .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; border-color: #2b251f !important; }
-        .red-text-trigger { color: #ff1a1a !important; border-color: #ff1a1a !important; }
+        /* 第11題特殊紅字效果 */
+        .red-text-trigger { color: #ff1a1a !important; font-weight: bold; border-color: #ff1a1a !important; }
         button.action-btn { background-color: transparent; color: #2b251f; border: 1px solid #2b251f; padding: 10px 28px; font-family: inherit; font-size: 15px; cursor: pointer; }
         button.action-btn:disabled { border-color: #d3c9b3; color: #a1947b; cursor: not-allowed; }
         .hidden { display: none !important; }
@@ -64,16 +65,16 @@
                 question: "11. 您聽說過關於沼澤的「故事」嗎？",
                 isSpecialQ11: true,
                 options: [
-                    { text: "……沒有", change: "Long long ago, a tale was born" },
-                    { text: "聽過怪物的故事", change: "In the mist, monsters roam" },
-                    { text: "聽過牙醫的故事", change: "A land of mystery, a hunting ground" },
-                    { text: "聽過“牙醫”的故事", change: "Welcome to the dentist's swamp" }
+                    { text: "……沒有", secret: "Long long ago, a tale was born" },
+                    { text: "聽過怪物的故事", secret: "In the mist, monsters roam" },
+                    { text: "聽過牙醫的故事", secret: "A land of mystery, a hunting ground" },
+                    { text: "聽過“牙醫”的故事", secret: "Welcome to the dentist's swamp" }
                 ]
             }
         ];
 
         let currentQuestionIndex = 0;
-        let q11Triggered = new Array(4).fill(false);
+        let q11Clicked = false;
 
         function startSurvey() {
             document.getElementById('welcome-screen').classList.add('hidden');
@@ -92,22 +93,21 @@
                 const btn = document.createElement('button');
                 btn.className = 'option-item';
                 btn.innerText = opt.text;
-                btn.onclick = () => handleSelect(idx, btn);
+                btn.onclick = () => handleSelect(idx, btn, data);
                 container.appendChild(btn);
             });
             document.getElementById('next-btn').disabled = true;
         }
 
-        function handleSelect(idx, btn) {
-            const data = questions[currentQuestionIndex];
-            if (data.isSpecialQ11) {
-                if (!q11Triggered[idx]) {
-                    btn.innerText = data.options[idx].change;
-                    btn.classList.add('red-text-trigger');
-                    q11Triggered[idx] = true;
-                }
+        function handleSelect(idx, btn, data) {
+            if (data.isSpecialQ11 && !q11Clicked) {
+                btn.innerText = data.options[idx].secret;
+                btn.classList.add('red-text-trigger');
+                q11Clicked = true;
                 document.getElementById('next-btn').disabled = false;
-            } else {
+                // 鎖定所有選項
+                document.querySelectorAll('.option-item').forEach(b => b.disabled = true);
+            } else if (!data.isSpecialQ11) {
                 document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 document.getElementById('next-btn').disabled = false;
