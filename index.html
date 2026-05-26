@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>口腔健康與習慣調查</title>
     <style>
-        body { background-color: #f4edd2; color: #2b251f; font-family: "Times New Roman", "Georgia", serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
-        #survey-container { max-width: 600px; width: 100%; border: 1px solid #a1947b; padding: 50px 40px; background-color: #fbf8eb; position: relative; }
+        body { background-color: #f4edd2; color: #2b251f; font-family: "Times New Roman", "Georgia", "Songti TC", serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        #survey-container { max-width: 600px; width: 100%; border: 1px solid #a1947b; padding: 50px 40px; background-color: #fbf8eb; position: relative; box-sizing: border-box; }
         #survey-container::before { content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid #d3c9b3; pointer-events: none; }
         .header-section { text-align: center; margin-bottom: 40px; border-bottom: 1px double #a1947b; padding-bottom: 30px; }
-        h1 { font-size: 26px; font-weight: normal; margin: 0 0 10px 0; }
+        h1 { font-size: 26px; font-weight: normal; letter-spacing: 2px; margin: 0 0 10px 0; }
+        .author { font-size: 14px; font-style: italic; color: #5c5146; margin: 0 0 25px 0; letter-spacing: 1px; }
+        .introduction { font-size: 15px; line-height: 1.8; color: #4a3f35; max-width: 450px; margin: 0 auto; text-align: justify; }
         .content-section { min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
         .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 25px; text-align: center; }
         .options-list { width: 100%; max-width: 400px; margin-bottom: 30px; }
-        .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3; cursor: pointer; text-align: left; font-family: inherit; }
+        .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3; cursor: pointer; text-align: left; font-family: inherit; font-size: 15px; }
         .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; }
-        button.action-btn { background-color: transparent; border: 1px solid #2b251f; padding: 10px 28px; cursor: pointer; }
+        button.action-btn { background-color: transparent; border: 1px solid #2b251f; padding: 10px 28px; font-size: 15px; cursor: pointer; }
         button.action-btn:disabled { border-color: #d3c9b3; color: #a1947b; cursor: not-allowed; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(43, 37, 31, 0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .modal-box { background-color: #fbf8eb; border: 1px solid #a1947b; padding: 35px; max-width: 400px; text-align: center; }
@@ -28,7 +30,11 @@
 <body>
     <div id="survey-container">
         <div id="welcome-screen">
-            <div class="header-section"><h1>口腔健康與習慣調查</h1></div>
+            <div class="header-section">
+                <h1>口腔健康與習慣調查</h1>
+                <div class="author">芬森·亨特</div>
+                <p class="introduction">本問卷旨在調查口腔健康與衛生習慣，請依據您的習慣作答。</p>
+            </div>
             <div class="content-section"><button class="action-btn" onclick="startSurvey()">開始作答</button></div>
         </div>
         <div id="question-screen" class="hidden">
@@ -52,23 +58,8 @@
             { question: "1. 您刷牙的頻率如何？", options: [{t:"餐後刷牙"}, {t:"早/晚刷牙"}, {t:"想到才刷牙"}, {t:"幾乎不刷牙"}] },
             { question: "2. 您刷牙時是否使用牙粉？", options: [{t:"每次都使用"}, {t:"偶爾使用"}, {t:"從不使用"}, {t:"……那是什麼？"}] },
             { question: "3. 您是否使用漱口水？", options: [{t:"每天使用"}, {t:"偶爾使用"}, {t:"很少使用"}, {t:"從不使用"}] },
-            { 
-                question: "4. 您是否曾罹患齲齒？",
-                options: [
-                    {t:"從未"}, {t:"曾罹患，已治療"}, 
-                    {t:"目前罹患，未治療", hint:"建議盡快就醫"}, 
-                    {t:"什麼是齲齒？", hint:"是蛀牙的意思呢"}
-                ] 
-            },
-            { 
-                question: "5. 您是否固定至牙科看診？",
-                options: [
-                    {t:"每半年一次或更多", hint:"乖孩子……"}, 
-                    {t:"每年一次或更少", hint:"還能再進步呢……"}, 
-                    {t:"有狀況才看診", hint:"這並不是好習慣……"}, 
-                    {t:"從未看過牙科", hint:"……"}
-                ] 
-            },
+            { question: "4. 您是否曾罹患齲齒？", options: [{t:"從未"}, {t:"曾罹患，已治療"}, {t:"目前罹患，未治療", h:"建議盡快就醫"}, {t:"什麼是齲齒？", h:"是蛀牙的意思呢"}] },
+            { question: "5. 您是否固定至牙科看診？", options: [{t:"每半年一次或更多", h:"乖孩子……"}, {t:"每年一次或更少", h:"還能再進步呢……"}, {t:"有狀況才看診", h:"這並不是好習慣……"}, {t:"從未看過牙科", h:"……"}] },
             { question: "6. 您是否知道什麼是「根管治療」？", options: [{t:"十分了解"}, {t:"大概知道"}, {t:"不太清楚"}, {t:"從未聽說"}] },
             { question: "7. 您是否相信「光療法」？", options: [{t:"深信不疑"}, {t:"相信"}, {t:"不相信"}, {t:"光療法是什麼？"}] },
             { question: "8. 您是否相信我……？", options: [{t:"當然"}, {t:"也許會"}, {t:"也許不會"}, {t:"拒絕相信"}] },
@@ -97,7 +88,7 @@
         }
         function handleSelect(idx, btn, opt) {
             const data = questions[currentQuestionIndex];
-            if (opt.hint) { document.getElementById('modal-content').innerText = opt.hint; document.getElementById('hint-modal').classList.remove('hidden'); }
+            if ((currentQuestionIndex === 3 || currentQuestionIndex === 4) && opt.h) { document.getElementById('modal-content').innerText = opt.h; document.getElementById('hint-modal').classList.remove('hidden'); }
             if (data.isSpecialQ11 && !q11Done) { btn.innerText = opt.h; btn.classList.add('red-text-trigger'); q11Done = true; document.getElementById('next-btn').disabled = false; }
             else if (data.isSpecialQ12) { document.getElementById('modal-content').innerText = "……非常好！"; document.getElementById('hint-modal').classList.remove('hidden'); document.getElementById('next-btn').disabled = false; }
             else if (data.isSpecialQ13) { btn.classList.remove('shake-forever'); document.getElementById('next-btn').disabled = false; }
