@@ -95,7 +95,7 @@
 
         .question-text {
             font-size: 18px;
-            line-6height: 1.6;
+            line-height: 1.6;
             margin-bottom: 25px;
             text-align: center;
             font-weight: normal;
@@ -472,7 +472,7 @@
                 options: [
                     { initial: "……什麼？", final: "當然" },
                     { initial: "……什麼？", final: "也許會", hint: "還不夠", hintId: "q8_b" },
-                    { initial: "……什麼？", final: "也許會不會", hint: "", hintId: "" },
+                    { initial: "……什麼？", final: "也許不會", hint: "", hintId: "" },
                     { initial: "……什麼？", final: "拒絕相信" }
                 ]
             },
@@ -517,8 +517,6 @@
             { question: "14. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "15. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] }
         ];
-
-        questions[7].options[2].final = "開設不會"; // 保持原邏輯
 
         let currentQuestionIndex = 0;
         let selectedOptionIndex = null;
