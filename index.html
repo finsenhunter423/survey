@@ -136,6 +136,15 @@
             border-color: #2b251f;
         }
 
+        /* 選項禁用/反灰狀態 */
+        .option-item:disabled {
+            background-color: #e8e3cf !important;
+            color: #a1947b !important;
+            border-color: #cbd2be !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
         .btn-container {
             text-align: center;
             width: 100%;
@@ -158,7 +167,6 @@
             color: #fbf8eb;
         }
 
-        /* 按鈕禁用狀態 */
         button.action-btn:disabled {
             border-color: #d3c9b3;
             color: #a1947b;
@@ -166,7 +174,7 @@
             opacity: 0.6;
         }
 
-        /* 古典風格提示框 (Modal) */
+        /* 古典風格提示框 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -210,7 +218,7 @@
             font-style: italic;
         }
 
-        /* 全黑遮罩 */
+        /* 全黑過場遮罩 */
         .blackout-overlay {
             position: fixed;
             top: 0;
@@ -231,32 +239,50 @@
             font-family: inherit;
         }
 
-        /* 第8題專用：滿版紅色處罰畫面（加粗斜體） */
+        /* 第8題專用：徹底充斥整個螢幕的紅色文字處罰畫面 */
         #red-punishment-screen {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background-color: #000000;
             color: #ff1a1a;
-            font-size: 32px;
+            font-size: 38px;
             font-weight: bold;
-            font-style: italic; /* 斜體修飾 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            word-break: break-all;
-            padding: 30px;
-            box-sizing: border-box;
+            font-style: italic;
             z-index: 3000;
-            letter-spacing: 6px;
-            line-height: 1.8;
+            letter-spacing: 4px;
+            line-height: 1.4;
             overflow: hidden;
+            word-break: break-all;
+            user-select: none;
+            padding: 0;
+            margin: 0;
         }
 
-        /* 網頁被迫整體黑化樣式 */
+        .text-filler {
+            width: 120%;
+            height: 120%;
+            margin-left: -10%;
+            margin-top: -5%;
+            text-align: justify;
+        }
+
+        /* 1.5秒選項閃爍變形動畫 */
+        @keyframes glitch-flicker {
+            0% { opacity: 1; }
+            20% { opacity: 0.2; }
+            40% { opacity: 0.9; }
+            60% { opacity: 0.1; }
+            80% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .glitch-active {
+            animation: glitch-flicker 0.25s ease-in-out;
+        }
+
+        /* 網頁整體被迫黑化樣式 */
         body.forced-dark {
             background-color: #0a0a0a !important;
             color: #8a8275 !important;
@@ -297,6 +323,7 @@
 
     <div id="survey-container">
         
+        <!-- 標頭與引言區域 -->
         <div id="welcome-screen">
             <div class="header-section">
                 <h1>口腔健康與習慣調查</h1>
@@ -313,6 +340,7 @@
             </div>
         </div>
 
+        <!-- 題目互動區域 -->
         <div id="question-screen" class="hidden">
             <div class="content-section">
                 <div id="progress" class="progress-indicator"></div>
@@ -325,6 +353,7 @@
             </div>
         </div>
 
+        <!-- 結束區域 -->
         <div id="end-screen" class="hidden">
             <div class="header-section">
                 <h1>調查結束</h1>
@@ -337,6 +366,7 @@
 
     </div>
 
+    <!-- 特殊互動提示框 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -344,12 +374,14 @@
         </div>
     </div>
 
+    <!-- 全黑過場遮罩 -->
     <div id="blackout-screen" class="blackout-overlay hidden">
         <div id="blackout-content" class="blackout-text">這就對了</div>
     </div>
 
+    <!-- 第8題專用：滿版紅色處罰畫面（內嵌動態生成巨量文字） -->
     <div id="red-punishment-screen" class="hidden">
-        <div>為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼為什麼</div>
+        <div id="matrix-filler" class="text-filler"></div>
     </div>
 
     <script>
@@ -372,17 +404,17 @@
                 options: [
                     { text: "從未" },
                     { text: "曾罹患，已治療" },
-                    { text: "目前罹患，未治療", hint: "建議盡快就醫" },
-                    { text: "什麼是齲齒？", hint: "是蛀牙的意思呢" }
+                    { text: "目前罹患，未治療", hint: "建議盡快就醫", hintId: "q4_c" },
+                    { text: "什麼是齲齒？", hint: "是蛀牙的意思呢", hintId: "q4_d" }
                 ]
             },
             {
                 question: "5. 您是否固定至牙科看診？",
                 options: [
-                    { text: "每半年一次或更多", hint: "乖孩子" },
-                    { text: "每年一次或更少", hint: "還能再進步呢……" },
-                    { text: "有狀況才看診", hint: "這並不是好習慣……" },
-                    { text: "從未看過牙科", hint: "為什麼不……？" }
+                    { text: "每半年一次或更多", hint: "乖孩子……", hintId: "q5_a" },
+                    { text: "每年一次或更少", hint: "還能再進步呢……", hintId: "q5_b" },
+                    { text: "有狀況才看診", hint: "這並不是好習慣……", hintId: "q5_c" },
+                    { text: "從未看過牙科", hint: "為什麼不……？", hintId: "q5_d" }
                 ]
             },
             {
@@ -399,12 +431,11 @@
                 isSpecialQ8: true,
                 options: [
                     { initial: "……什麼？", final: "當然" },
-                    { initial: "……什麼？", final: "也許會" },
+                    { initial: "……什麼？", final: "也許會", hint: "還不夠", hintId: "q8_b" },
                     { initial: "……什麼？", final: "也許會不" },
                     { initial: "……什麼？", final: "拒絕相信" }
                 ]
             },
-            // 以下為 9~15 題預留位置
             { question: "9. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "10. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "11. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
@@ -419,13 +450,26 @@
         
         let q8WrongCount = 0; 
         let q8Timer = null;
-        let q8TextsRevealed = false;
+        let q8TextsRevealed = false; // 全局紀錄第8題正式選項是否已被揭露
         let disabledOptionsQ8 = [false, false, false, false];
+        
+        // 用於追蹤哪些提示框已經被彈出過
+        const triggeredHints = {};
 
         function startSurvey() {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('question-screen').classList.remove('hidden');
             loadQuestion();
+        }
+
+        function fillRedScreen() {
+            const filler = document.getElementById('matrix-filler');
+            let txt = "";
+            // 迴圈生成超高密度文字以徹底填滿任何解析度的螢幕
+            for(let i = 0; i < 800; i++) {
+                txt += "為什麼";
+            }
+            filler.innerText = txt;
         }
 
         function loadQuestion() {
@@ -443,67 +487,94 @@
             const labels = ['A. ', 'B. ', 'C. ', 'D. '];
             
             if (currentData.isSpecialQ8) {
-                q8TextsRevealed = false;
+                // 生成選項按鈕
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
                     btn.id = `q8-opt-${index}`;
-                    btn.innerText = labels[index] + opt.initial;
-                    btn.onclick = () => selectOption(index, null);
-                    if (disabledOptionsQ8[index]) btn.disabled = true;
+                    
+                    // 如果這個選項以前被封鎖過，維持反灰與正式文字，且不重複跑「什麼」
+                    if (disabledOptionsQ8[index]) {
+                        btn.innerText = labels[index] + opt.final;
+                        btn.disabled = true;
+                    } else if (q8TextsRevealed) {
+                        // 如果第8題正式文字已經被揭露過，直接顯示正式版
+                        btn.innerText = labels[index] + opt.final;
+                    } else {
+                        // 否則初始狀態顯示「……什麼？」
+                        btn.innerText = labels[index] + opt.initial;
+                    }
+                    
+                    btn.onclick = () => selectOption(index, opt.hint, opt.hintId);
                     container.appendChild(btn);
                 });
 
-                q8Timer = setTimeout(() => {
-                    q8TextsRevealed = true;
-                    currentData.options.forEach((opt, index) => {
-                        const btn = document.getElementById(`q8-opt-${index}`);
-                        if (btn) {
-                            btn.innerText = labels[index] + opt.final;
-                        }
-                    });
-                }, 3000);
+                // 如果正式選項還沒被揭露過，啟動 1.5 秒定時器
+                if (!q8TextsRevealed) {
+                    q8Timer = setTimeout(() => {
+                        q8TextsRevealed = true;
+                        currentData.options.forEach((opt, index) => {
+                            const btn = document.getElementById(`q8-opt-${index}`);
+                            if (btn && !disabledOptionsQ8[index]) {
+                                btn.classList.add('glitch-active');
+                                btn.innerText = labels[index] + opt.final;
+                                setTimeout(() => btn.classList.remove('glitch-active'), 250);
+                            }
+                        });
+                    }, 1500); // 準確設定 1.5 秒
+                }
 
             } else {
+                // 一般題目的渲染邏輯
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
                     btn.innerText = labels[index] + opt.text;
-                    btn.onclick = () => selectOption(index, opt.hint);
+                    btn.onclick = () => selectOption(index, opt.hint, opt.hintId);
                     container.appendChild(btn);
                 });
             }
         }
 
-        function selectOption(index, hint) {
+        function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
             
+            // 第 8 題選錯（選到 B、C、D）的特殊懲罰機制
             if (currentData.isSpecialQ8 && index !== 0) {
                 q8WrongCount++;
-                disabledOptionsQ8[index] = true;
+                disabledOptionsQ8[index] = true; // 標記該選項被封鎖
                 document.getElementById('next-btn').disabled = true;
 
+                // 即便選錯，若該選項有提示（如B的「還不夠」），一樣遵循一次性提示規則
+                let shouldShowHint = false;
+                if (hint && hintId && !triggeredHints[hintId]) {
+                    triggeredHints[hintId] = true;
+                    shouldShowHint = true;
+                }
+
                 if (q8WrongCount === 1) {
-                    // 第一次錯：色調不改變，只跳提示框
-                    document.getElementById('modal-content').innerText = "……為什麼？";
+                    // 第一次選錯：色調維持原樣，彈出提示
+                    document.getElementById('modal-content').innerText = shouldShowHint ? hint : "……為什麼？";
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount === 2) {
-                    // 第二次錯：畫面轉黑，跳提示框
+                    // 第二次選錯：畫面強制轉黑，彈出提示
                     document.body.classList.add('forced-dark');
-                    document.getElementById('modal-content').innerText = "為什麼？";
+                    document.getElementById('modal-content').innerText = shouldShowHint ? hint : "為什麼？";
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount >= 3) {
-                    // 第三次錯：斜體紅字充斥全畫面
+                    // 第三次選錯：巨量斜體紅字塞滿並充斥整個螢幕
+                    fillRedScreen();
                     const redScreen = document.getElementById('red-punishment-screen');
                     redScreen.classList.remove('hidden');
                     setTimeout(() => {
                         redScreen.classList.add('hidden');
-                        loadQuestion();
+                        loadQuestion(); // 重新載入，錯過的選項會保持反灰且顯示正確文字
                     }, 3000);
                 }
                 return;
             }
 
+            // 正常點選正確選項的邏輯
             selectedOptionIndex = index;
             const items = document.querySelectorAll('.option-item');
             items.forEach((item, idx) => {
@@ -518,9 +589,16 @@
                 }
             });
             
-            if (hint) {
-                document.getElementById('modal-content').innerText = hint;
-                document.getElementById('hint-modal').classList.remove('hidden');
+            // 全局提示機制：檢查是否已跳出過
+            if (hint && hintId) {
+                if (!triggeredHints[hintId]) {
+                    triggeredHints[hintId] = true; // 記錄此提示已被觸發
+                    document.getElementById('modal-content').innerText = hint;
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                } else {
+                    // 若已跳出過，不顯示提示框，直接解鎖下一題按鈕
+                    document.getElementById('next-btn').disabled = false;
+                }
             } else {
                 document.getElementById('next-btn').disabled = false;
             }
