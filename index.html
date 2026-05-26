@@ -5,214 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>口腔健康與習慣調查</title>
     <style>
-        /* 19世紀簡約古典風格 */
-        body {
-            background-color: #f4edd2;
-            color: #2b251f;
-            font-family: "Times New Roman", "Georgia", "Noto Serif TC", "Songti TC", serif;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 90vh;
-            transition: background-color 0.5s ease, color 0.5s ease;
-        }
-
-        #survey-container {
-            max-width: 600px;
-            width: 100%;
-            border: 1px solid #a1947b;
-            padding: 50px 40px;
-            background-color: #fbf8eb;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            position: relative;
-            box-sizing: border-box;
-            transition: background-color 0.5s ease, border-color 0.5s ease;
-        }
-
-        #survey-container::before {
-            content: "";
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            border: 1px solid #d3c9b3;
-            pointer-events: none;
-            transition: border-color 0.5s ease;
-        }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px double #a1947b;
-            padding-bottom: 30px;
-        }
-
-        h1 { font-size: 26px; font-weight: normal; letter-spacing: 2px; margin: 0 0 10px 0; }
-        .author { font-size: 14px; font-style: italic; color: #5c5146; margin: 0 0 25px 0; letter-spacing: 1px; }
-        .introduction { font-size: 15px; line-height: 1.8; color: #4a3f35; max-width: 450px; margin: 0 auto; text-align: justify; }
-
+        body { background-color: #f4edd2; color: #2b251f; font-family: "Times New Roman", "Georgia", serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        #survey-container { max-width: 600px; width: 100%; border: 1px solid #a1947b; padding: 50px 40px; background-color: #fbf8eb; position: relative; }
+        #survey-container::before { content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid #d3c9b3; pointer-events: none; }
+        .header-section { text-align: center; margin-bottom: 40px; border-bottom: 1px double #a1947b; padding-bottom: 30px; }
+        h1 { font-size: 26px; font-weight: normal; margin: 0 0 10px 0; }
         .content-section { min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
-        .progress-indicator { font-size: 14px; font-style: italic; color: #7a6f62; margin-bottom: 15px; letter-spacing: 1px; }
-        .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 25px; text-align: center; font-weight: normal; }
-
+        .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 25px; text-align: center; }
         .options-list { width: 100%; max-width: 400px; margin-bottom: 30px; }
-        .option-item {
-            display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px;
-            background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3;
-            text-align: left; font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.2s ease;
-        }
-        .option-item:hover:not(:disabled) { background-color: #f4edd2; border-color: #a1947b; }
-        .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; border-color: #2b251f !important; }
-
-        /* 特殊題型效果 */
-        .red-text-trigger { color: #ff1a1a !important; }
-        @keyframes constant-shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-        .shake-forever { animation: constant-shake 0.2s infinite; }
-
-        button.action-btn { background-color: transparent; color: #2b251f; border: 1px solid #2b251f; padding: 10px 28px; font-family: inherit; font-size: 15px; cursor: pointer; }
+        .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3; cursor: pointer; text-align: left; font-family: inherit; }
+        .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; }
+        button.action-btn { background-color: transparent; border: 1px solid #2b251f; padding: 10px 28px; cursor: pointer; }
         button.action-btn:disabled { border-color: #d3c9b3; color: #a1947b; cursor: not-allowed; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(43, 37, 31, 0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background-color: #fbf8eb; border: 1px solid #a1947b; padding: 35px 30px; max-width: 400px; text-align: center; }
-        .modal-text { font-size: 16px; color: #2b251f; font-style: italic; }
-        
+        .modal-box { background-color: #fbf8eb; border: 1px solid #a1947b; padding: 35px; max-width: 400px; text-align: center; }
+        .red-text-trigger { color: #ff1a1a !important; }
+        @keyframes constant-shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+        .shake-forever { animation: constant-shake 0.1s infinite; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
     <div id="survey-container">
         <div id="welcome-screen">
-            <div class="header-section">
-                <h1>口腔健康與習慣調查</h1>
-                <div class="author">芬森·亨特</div>
-                <p class="introduction">本問卷旨在調查口腔健康與衛生習慣，請依據您的習慣作答。</p>
-            </div>
+            <div class="header-section"><h1>口腔健康與習慣調查</h1></div>
             <div class="content-section"><button class="action-btn" onclick="startSurvey()">開始作答</button></div>
         </div>
-
         <div id="question-screen" class="hidden">
             <div class="content-section">
-                <div id="progress" class="progress-indicator"></div>
+                <div id="progress" style="font-style:italic; margin-bottom:15px;"></div>
                 <div id="question-text" class="question-text"></div>
                 <div id="options-container" class="options-list"></div>
                 <button id="next-btn" class="action-btn" onclick="nextQuestion()" disabled>下一題</button>
             </div>
         </div>
     </div>
-
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
-            <div id="modal-content" class="modal-text"></div>
-            <button class="action-btn" style="margin-top:20px;" onclick="closeModal()">關閉</button>
+            <div id="modal-content" style="font-style:italic; margin-bottom:20px;"></div>
+            <button class="action-btn" onclick="closeModal()">關閉</button>
         </div>
     </div>
 
     <script>
         const questions = [
-            { question: "1. 您刷牙的頻率如何？", options: [{ text: "餐後刷牙" }, { text: "早/晚刷牙" }, { text: "想到才刷牙" }, { text: "幾乎不刷牙" }] },
-            { question: "2. 您刷牙時是否使用牙粉？", options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }] },
-            { question: "3. 您是否使用漱口水？", options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }] },
-            { question: "4. 您是否曾罹患齲齒？", options: [{ text: "從未" }, { text: "曾罹患，已治療" }, { text: "目前罹患，未治療" }, { text: "什麼是齲齒？" }] },
-            { question: "5. 您是否固定至牙科看診？", options: [{ text: "每半年一次或更多" }, { text: "每年一次或更少" }, { text: "有狀況才看診" }, { text: "從未看過牙科" }] },
-            { question: "6. 您是否知道什麼是「根管治療」？", options: [{ text: "十分了解" }, { text: "大概知道" }, { text: "不太清楚" }, { text: "從未聽說" }] },
-            { question: "7. 您是否相信「光療法」？", options: [{ text: "深信不疑" }, { text: "相信" }, { text: "不相信" }, { text: "光療法是什麼？" }] },
-            { question: "8. 您是否相信我……？", options: [{ text: "當然" }, { text: "也許會" }, { text: "也許不會" }, { text: "拒絕相信" }] },
-            { question: "9. 您食用甜點或含糖飲料的頻率如何？", options: [{ text: "每天" }, { text: "經常" }, { text: "很少" }, { text: "幾乎沒有" }] },
-            { question: "10. 您是否接受過牙齒矯正？", options: [{ text: "正在進行" }, { text: "曾經有" }, { text: "未來計畫進行" }, { text: "不曾且無計畫接受" }] },
+            { question: "1. 您刷牙的頻率如何？", options: [{t:"餐後刷牙"}, {t:"早/晚刷牙"}, {t:"想到才刷牙"}, {t:"幾乎不刷牙"}] },
+            { question: "2. 您刷牙時是否使用牙粉？", options: [{t:"每次都使用"}, {t:"偶爾使用"}, {t:"從不使用"}, {t:"……那是什麼？"}] },
+            { question: "3. 您是否使用漱口水？", options: [{t:"每天使用"}, {t:"偶爾使用"}, {t:"很少使用"}, {t:"從不使用"}] },
             { 
-                question: "11. 您聽說過關於沼澤的「故事」嗎？",
-                isSpecialQ11: true,
+                question: "4. 您是否曾罹患齲齒？",
                 options: [
-                    { text: "……沒有", hidden: "Long long ago, a tale was born" },
-                    { text: "聽過怪物的故事", hidden: "In the mist, monsters roam" },
-                    { text: "聽過牙醫的故事", hidden: "A land of mystery, a hunting ground" },
-                    { text: "聽過“牙醫”的故事", hidden: "Welcome to the dentist's swamp" }
-                ]
+                    {t:"從未"}, {t:"曾罹患，已治療"}, 
+                    {t:"目前罹患，未治療", hint:"建議盡快就醫"}, 
+                    {t:"什麼是齲齒？", hint:"是蛀牙的意思呢"}
+                ] 
             },
             { 
-                question: "12. 您是否願意進入「診療室」",
-                isSpecialQ12: true,
-                options: [{ text: "願意" }, { text: "願意" }, { text: "願意" }, { text: "願意" }]
+                question: "5. 您是否固定至牙科看診？",
+                options: [
+                    {t:"每半年一次或更多", hint:"乖孩子……"}, 
+                    {t:"每年一次或更少", hint:"還能再進步呢……"}, 
+                    {t:"有狀況才看診", hint:"這並不是好習慣……"}, 
+                    {t:"從未看過牙科", hint:"……"}
+                ] 
             },
-            { 
-                question: "13. 您願意接受口腔檢查嗎？",
-                isSpecialQ13: true,
-                options: [{ text: "願意" }]
-            }
+            { question: "6. 您是否知道什麼是「根管治療」？", options: [{t:"十分了解"}, {t:"大概知道"}, {t:"不太清楚"}, {t:"從未聽說"}] },
+            { question: "7. 您是否相信「光療法」？", options: [{t:"深信不疑"}, {t:"相信"}, {t:"不相信"}, {t:"光療法是什麼？"}] },
+            { question: "8. 您是否相信我……？", options: [{t:"當然"}, {t:"也許會"}, {t:"也許不會"}, {t:"拒絕相信"}] },
+            { question: "9. 您食用甜點或含糖飲料的頻率如何？", options: [{t:"每天"}, {t:"經常"}, {t:"很少"}, {t:"幾乎沒有"}] },
+            { question: "10. 您是否接受過牙齒矯正？", options: [{t:"正在進行"}, {t:"曾經有"}, {t:"未來計畫進行"}, {t:"不曾且無計畫接受"}] },
+            { question: "11. 您聽說過關於沼澤的「故事」嗎？", isSpecialQ11: true, options: [{t:"……沒有", h:"Long long ago, a tale was born"}, {t:"聽過怪物的故事", h:"In the mist, monsters roam"}, {t:"聽過牙醫的故事", h:"A land of mystery, a hunting ground"}, {t:"聽過“牙醫”的故事", h:"Welcome to the dentist's swamp"}] },
+            { question: "12. 您是否願意進入「診療室」", isSpecialQ12: true, options: [{t:"願意"}, {t:"願意"}, {t:"願意"}, {t:"願意"}] },
+            { question: "13. 您願意接受口腔檢查嗎？", isSpecialQ13: true, options: [{t:"願意"}] }
         ];
 
-        let currentQuestionIndex = 0;
-        let q11Triggered = false;
-
-        function startSurvey() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('question-screen').classList.remove('hidden');
-            loadQuestion();
-        }
-
+        let currentQuestionIndex = 0, q11Done = false;
+        function startSurvey() { document.getElementById('welcome-screen').classList.add('hidden'); document.getElementById('question-screen').classList.remove('hidden'); loadQuestion(); }
         function loadQuestion() {
             const data = questions[currentQuestionIndex];
             document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 13`;
             document.getElementById('question-text').innerText = data.question;
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
+            const container = document.getElementById('options-container'); container.innerHTML = '';
             data.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = 'option-item';
-                btn.innerText = opt.text;
-                if (data.isSpecialQ13) btn.classList.add('shake-forever');
-                btn.onclick = () => handleSelect(idx, btn);
+                btn.className = 'option-item'; btn.innerText = opt.t;
+                if(data.isSpecialQ13) btn.classList.add('shake-forever');
+                btn.onclick = () => handleSelect(idx, btn, opt);
                 container.appendChild(btn);
             });
             document.getElementById('next-btn').disabled = true;
         }
-
-        function handleSelect(idx, btn) {
+        function handleSelect(idx, btn, opt) {
             const data = questions[currentQuestionIndex];
-            
-            if (data.isSpecialQ11 && !q11Triggered) {
-                btn.innerText = data.options[idx].hidden;
-                btn.classList.add('red-text-trigger');
-                q11Triggered = true;
-                document.getElementById('next-btn').disabled = false;
-            } else if (data.isSpecialQ12) {
-                document.getElementById('modal-content').innerText = "……非常好！";
-                document.getElementById('hint-modal').classList.remove('hidden');
-                document.getElementById('next-btn').disabled = false;
-            } else if (data.isSpecialQ13) {
-                btn.classList.remove('shake-forever');
-                document.getElementById('next-btn').disabled = false;
-            } else if (!data.isSpecialQ11) {
-                document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                document.getElementById('next-btn').disabled = false;
-            }
+            if (opt.hint) { document.getElementById('modal-content').innerText = opt.hint; document.getElementById('hint-modal').classList.remove('hidden'); }
+            if (data.isSpecialQ11 && !q11Done) { btn.innerText = opt.h; btn.classList.add('red-text-trigger'); q11Done = true; document.getElementById('next-btn').disabled = false; }
+            else if (data.isSpecialQ12) { document.getElementById('modal-content').innerText = "……非常好！"; document.getElementById('hint-modal').classList.remove('hidden'); document.getElementById('next-btn').disabled = false; }
+            else if (data.isSpecialQ13) { btn.classList.remove('shake-forever'); document.getElementById('next-btn').disabled = false; }
+            else { document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); document.getElementById('next-btn').disabled = false; }
         }
-
         function closeModal() { document.getElementById('hint-modal').classList.add('hidden'); }
-        
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) loadQuestion();
-            else document.getElementById('question-text').innerText = "調查結束。";
-        }
+        function nextQuestion() { currentQuestionIndex++; if(currentQuestionIndex < questions.length) loadQuestion(); else document.getElementById('question-text').innerText = "調查結束。"; }
     </script>
 </body>
 </html>
