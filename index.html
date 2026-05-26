@@ -218,7 +218,7 @@
             font-style: italic;
         }
 
-        /* 第 8 題與第 12 題專用：提示文字變紅的樣式 */
+        /* 第 8 題專用：二次錯誤時提示文字變紅的樣式 */
         .modal-text.warning-red {
             color: #ff1a1a !important;
         }
@@ -486,7 +486,12 @@
             { 
                 question: "12. 您是否願意進入「診療室」", 
                 isSpecialQ12: true,
-                options: [{ text: "願意" }, { text: "願意" }, { text: "願意" }, { text: "願意" }] 
+                options: [
+                    { text: "願意", hasTriggered: false }, 
+                    { text: "願意", hasTriggered: false }, 
+                    { text: "願意", hasTriggered: false }, 
+                    { text: "願意", hasTriggered: false }
+                ] 
             },
             { question: "13. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
             { question: "14. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
@@ -572,7 +577,13 @@
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
                     btn.id = `opt-${index}`;
-                    btn.innerText = labels[index] + opt.initial;
+                    // 初始化時需考慮是否已經被揭露過
+                    if (opt.hasRevealed) {
+                        btn.innerText = labels[index] + opt.revealed;
+                        btn.classList.add('q11-revealed');
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
+                    }
                     btn.onclick = () => selectOption(index);
                     container.appendChild(btn);
                 });
@@ -706,10 +717,19 @@
                     }
                 });
                 
-                const modalContent = document.getElementById('modal-content');
-                modalContent.innerText = "……非常好！";
-                modalContent.classList.add('warning-red');
-                document.getElementById('hint-modal').classList.remove('hidden');
+                const optData = currentData.options[index];
+                if (!optData.hasTriggered) {
+                    // 首次點擊，觸發提示框
+                    optData.hasTriggered = true;
+                    const modalContent = document.getElementById('modal-content');
+                    modalContent.innerText = "……非常好！";
+                    // 移除 warning-red 樣式，保持原本的古典風格顏色
+                    modalContent.classList.remove('warning-red');
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                } else {
+                    // 已觸發過，直接解鎖下一題
+                    document.getElementById('next-btn').disabled = false;
+                }
                 return;
             }
 
