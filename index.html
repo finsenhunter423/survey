@@ -317,6 +317,18 @@
             border-color: #2b251f !important;
         }
 
+        /* 第 13 題專用：選項文字與邊框固定呈現紅色 */
+        .option-item.q13-red {
+            color: #ff1a1a !important;
+            border-color: #ff1a1a !important;
+        }
+        /* 當第 13 題選項處於選中狀態時，字體改為淡紅以利辨識 */
+        .option-item.selected.q13-red {
+            background-color: #2b251f !important;
+            color: #ff5555 !important;
+            border-color: #2b251f !important;
+        }
+
         /* 網頁整體被迫黑化樣式 */
         body.forced-dark {
             background-color: #0a0a0a !important;
@@ -495,6 +507,7 @@
             },
             { 
                 question: "13. 您願意接受口腔檢查嗎？", 
+                isSpecialQ13: true,
                 options: [
                     { text: "願意" },
                     { text: "願意" },
@@ -547,7 +560,7 @@
             
             const nextBtn = document.getElementById('next-btn');
             nextBtn.disabled = true;
-            nextBtn.innerText = '下一題'; // 重置按鈕文字
+            nextBtn.innerText = '下一題'; 
             
             const currentData = questions[currentQuestionIndex];
             
@@ -560,7 +573,6 @@
             const labels = ['A. ', 'B. ', 'C. ', 'D. '];
             
             if (currentData.isSpecialQ14) {
-                // 第 14 題無選項，直接讓按鈕變文字並解鎖
                 nextBtn.innerText = '……選項呢？';
                 nextBtn.disabled = false;
             } else if (currentData.isSpecialQ8) {
@@ -640,6 +652,15 @@
                     }, 800);
                 }
 
+            } else if (currentData.isSpecialQ13) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item q13-red';
+                    btn.id = `opt-${index}`;
+                    btn.innerText = labels[index] + opt.text;
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
             } else {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
@@ -758,7 +779,7 @@
                 return;
             }
 
-            // 第 12 題特殊處理分支（取消提示框，直接選取並解鎖下一題）
+            // 第 12 題特殊處理分支
             if (currentData.isSpecialQ12) {
                 selectedOptionIndex = index;
                 const items = document.querySelectorAll('.option-item');
@@ -773,7 +794,7 @@
                 return;
             }
 
-            // 一般題目點選邏輯
+            // 一般題目與第 13 題點選邏輯
             selectedOptionIndex = index;
             const items = document.querySelectorAll('.option-item');
             items.forEach((item, idx) => {
@@ -806,13 +827,12 @@
                     q14ModalStage = 2;
                     const modalContent = document.getElementById('modal-content');
                     modalContent.innerText = "您當然願意，不是嗎？";
-                    // 保持紅色警告視覺
                     document.getElementById('modal-close-btn').innerText = "……是的";
-                    return; // 停留在提示框
+                    return; 
                 } else if (q14ModalStage === 2) {
                     document.getElementById('hint-modal').classList.add('hidden');
                     document.getElementById('modal-content').classList.remove('warning-red');
-                    document.getElementById('modal-close-btn').innerText = "關閉"; // 恢復按鈕文字
+                    document.getElementById('modal-close-btn').innerText = "關閉"; 
                     proceedToNext();
                     return;
                 }
@@ -832,7 +852,7 @@
         function nextQuestion() {
             const currentData = questions[currentQuestionIndex];
 
-            // 第 14 題邏輯（因為沒有選項，跳過 null 檢查）
+            // 第 14 題邏輯
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
                 const modalContent = document.getElementById('modal-content');
