@@ -129,11 +129,14 @@
             border-color: #a1947b;
         }
 
-        /* 被選中的選項樣式 */
+        /* 最佳化：被選中的選項樣式（禁止滑鼠事件與文字反白） */
         .option-item.selected {
-            background-color: #2b251f;
-            color: #fbf8eb;
-            border-color: #2b251f;
+            background-color: #2b251f !important;
+            color: #fbf8eb !important;
+            border-color: #2b251f !important;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         /* 選項禁用/反灰狀態 */
@@ -282,6 +285,24 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
+        /* 畫面劇烈震動動畫效果 */
+        @keyframes container-shake {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-8px, 2px); }
+            20% { transform: translate(7px, -3px); }
+            30% { transform: translate(-6px, -1px); }
+            40% { transform: translate(8px, 3px); }
+            50% { transform: translate(-5px, 1px); }
+            60% { transform: translate(6px, -2px); }
+            70% { transform: translate(-7px, 2px); }
+            80% { transform: translate(5px, -1px); }
+            90% { transform: translate(-3px, 3px); }
+            100% { transform: translate(0, 0); }
+        }
+        .shake-active {
+            animation: container-shake 0.4s ease-in-out;
+        }
+
         /* 網頁整體被迫黑化樣式 */
         body.forced-dark {
             background-color: #0a0a0a !important;
@@ -323,6 +344,7 @@
 
     <div id="survey-container">
         
+        <!-- 標頭與引言區域 -->
         <div id="welcome-screen">
             <div class="header-section">
                 <h1>口腔健康與習慣調查</h1>
@@ -339,6 +361,7 @@
             </div>
         </div>
 
+        <!-- 題目互動區域 -->
         <div id="question-screen" class="hidden">
             <div class="content-section">
                 <div id="progress" class="progress-indicator"></div>
@@ -351,6 +374,7 @@
             </div>
         </div>
 
+        <!-- 結束區域 -->
         <div id="end-screen" class="hidden">
             <div class="header-section">
                 <h1>調查結束</h1>
@@ -363,6 +387,7 @@
 
     </div>
 
+    <!-- 特殊互動提示框 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -370,10 +395,12 @@
         </div>
     </div>
 
+    <!-- 全黑過場遮罩 -->
     <div id="blackout-screen" class="blackout-overlay hidden">
         <div id="blackout-content" class="blackout-text">這就對了</div>
     </div>
 
+    <!-- 第8題專用：滿版紅色處罰畫面（內嵌動態生成巨量文字） -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler" class="text-filler"></div>
     </div>
@@ -457,7 +484,6 @@
             loadQuestion();
         }
 
-        // 修改文字填充邏輯：根據觸發選項動態決定文字內容
         function fillRedScreen(targetWord) {
             const filler = document.getElementById('matrix-filler');
             let txt = "";
@@ -465,6 +491,15 @@
                 txt += targetWord;
             }
             filler.innerText = txt;
+        }
+
+        // 觸發畫面震動特效的通用函式
+        function triggerScreenShake() {
+            const container = document.getElementById('survey-container');
+            container.classList.remove('shake-active');
+            void container.offsetWidth; // 強制瀏覽器重繪，以重複觸發動畫
+            container.add('shake-active');
+            setTimeout(() => container.classList.remove('shake-active'), 400);
         }
 
         function loadQuestion() {
@@ -501,6 +536,7 @@
                 });
 
                 if (!q8TextsRevealed) {
+                    // 最佳化：將開頭時長縮短至 0.8 秒（800毫秒）
                     q8Timer = setTimeout(() => {
                         q8TextsRevealed = true;
                         currentData.options.forEach((opt, index) => {
@@ -511,7 +547,7 @@
                                 setTimeout(() => btn.classList.remove('glitch-active'), 250);
                             }
                         });
-                    }, 1500);
+                    }, 800);
                 }
 
             } else {
@@ -528,7 +564,15 @@
         function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
             
+            // 第 7 題選錯時（選 B, C, D）加入畫面震動
+            if (currentData.isSpecialQ7 && index !== 0) {
+                triggerScreenShake();
+            }
+            
+            // 第 8 題選錯的懲罰機制（包含畫面震動）
             if (currentData.isSpecialQ8 && index !== 0) {
+                triggerScreenShake(); // 只要選錯立即引發震動
+                
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
                 document.getElementById('next-btn').disabled = true;
@@ -547,7 +591,6 @@
                     document.getElementById('modal-content').innerText = shouldShowHint ? hint : "為什麼？";
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount >= 3) {
-                    // 新增邏輯：若第三次選錯時當下是 B 選項(index 為 1)，文字變更為「還不夠」
                     const punishText = (index === 1) ? "還不夠" : "為什麼";
                     fillRedScreen(punishText);
                     
