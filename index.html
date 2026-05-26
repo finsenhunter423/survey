@@ -285,7 +285,6 @@
             margin-left: -10%;
             margin-top: -5%;
             text-align: justify;
-            /* 持續進行極其劇烈的震動 */
             animation: text-heavy-shake 0.15s infinite linear;
         }
 
@@ -302,17 +301,22 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
-        /* 第7題專用：單一選項短促震動動態效果（持續0.3秒） */
+        /* 第7題專用：更高頻率、時間回調（0.4秒）的選項抖動效果 */
         @keyframes item-shake {
             0% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
+            10% { transform: translateX(-8px); }
+            20% { transform: translateX(8px); }
+            30% { transform: translateX(-7px); }
+            40% { transform: translateX(7px); }
+            50% { transform: translateX(-6px); }
+            60% { transform: translateX(6px); }
+            70% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            90% { transform: translateX(-3px); }
             100% { transform: translateX(0); }
         }
         .item-shake-active {
-            animation: item-shake 0.3s ease-in-out;
+            animation: item-shake 0.4s ease-in-out;
         }
 
         /* 網頁整體被迫黑化樣式 */
@@ -576,7 +580,7 @@
                 if (index !== 0) {
                     document.getElementById('next-btn').disabled = true;
                     
-                    // 選項短促震動 (持續0.3秒)
+                    // 高頻率震動效果（持續0.4秒）
                     targetBtn.classList.remove('item-shake-active');
                     void targetBtn.offsetWidth; 
                     targetBtn.classList.add('item-shake-active');
@@ -587,14 +591,14 @@
                         targetBtn.innerText = labels[index] + "深信不疑";
                         
                         document.getElementById('next-btn').disabled = false;
-                    }, 300);
+                    }, 400); // 延時與動畫同步回調為 400ms
                 } else {
                     document.getElementById('next-btn').disabled = false;
                 }
                 return;
             }
             
-            // 第 8 題選錯的分支（刪除原畫面震動，改為紅色滿版文字劇烈晃動）
+            // 第 8 題選錯的分支
             if (currentData.isSpecialQ8 && index !== 0) {
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
