@@ -886,11 +886,12 @@
             blackoutContent.style.color = "#ff1a1a"; // 紅字顯示
             blackout.classList.remove('hidden');
             
+            // 全黑畫面持續時間修改為 3 秒 (3000毫秒)
             setTimeout(() => {
                 blackout.classList.add('hidden');
                 blackoutContent.style.color = "#ffffff"; // 還原色系
                 proceedToNext();
-            }, 5000);
+            }, 3000);
         }
 
         function handleQ15Dot(trueBtn, dotBtn) {
@@ -955,7 +956,7 @@
         function nextQuestion() {
             const currentData = questions[currentQuestionIndex];
 
-            // 第 14 題邏輯
+            // 第 14 題邏輯：直接點按觸發強迫提示框流程
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
                 const modalContent = document.getElementById('modal-content');
