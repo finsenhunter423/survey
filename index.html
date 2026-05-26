@@ -2,123 +2,99 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>口腔健康與習慣調查</title>
     <style>
-        /* 19世紀簡約古典風格 */
-        body { background-color: #f4edd2; color: #2b251f; font-family: "Times New Roman", "Georgia", "Noto Serif TC", "Songti TC", serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; transition: background-color 0.5s ease, color 0.5s ease; }
-        #survey-container { max-width: 600px; width: 100%; border: 1px solid #a1947b; padding: 50px 40px; background-color: #fbf8eb; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); position: relative; box-sizing: border-box; }
-        #survey-container::before { content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid #d3c9b3; pointer-events: none; }
-        .header-section { text-align: center; margin-bottom: 40px; border-bottom: 1px double #a1947b; padding-bottom: 30px; }
-        h1 { font-size: 26px; font-weight: normal; letter-spacing: 2px; margin: 0 0 10px 0; }
-        .author { font-size: 14px; font-style: italic; color: #5c5146; margin: 0 0 25px 0; letter-spacing: 1px; }
-        .introduction { font-size: 15px; line-height: 1.8; color: #4a3f35; max-width: 450px; margin: 0 auto; text-align: justify; }
-        .content-section { min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
-        .progress-indicator { font-size: 14px; font-style: italic; color: #7a6f62; margin-bottom: 15px; letter-spacing: 1px; }
-        .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 25px; text-align: center; }
-        .options-list { width: 100%; max-width: 400px; margin-bottom: 30px; }
-        .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background-color: transparent; color: #2b251f; border: 1px solid #d3c9b3; text-align: left; font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.2s ease; }
-        .option-item:hover:not(:disabled) { background-color: #f4edd2; border-color: #a1947b; }
-        .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; border-color: #2b251f !important; }
-        /* 第11題特殊紅字效果 */
-        .red-text-trigger { color: #ff1a1a !important; font-weight: bold; border-color: #ff1a1a !important; }
-        button.action-btn { background-color: transparent; color: #2b251f; border: 1px solid #2b251f; padding: 10px 28px; font-family: inherit; font-size: 15px; cursor: pointer; }
-        button.action-btn:disabled { border-color: #d3c9b3; color: #a1947b; cursor: not-allowed; }
+        body { background-color: #f4edd2; color: #2b251f; font-family: "Times New Roman", "Georgia", serif; margin: 0; padding: 40px 20px; transition: background-color 0.5s ease; }
+        #survey-container { max-width: 600px; margin: auto; border: 1px solid #a1947b; padding: 50px 40px; background-color: #fbf8eb; position: relative; }
         .hidden { display: none !important; }
+        .option-item { display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px; background: transparent; border: 1px solid #d3c9b3; cursor: pointer; text-align: left; }
+        .option-item.selected { background-color: #2b251f !important; color: #fbf8eb !important; }
+        .red-text { color: #ff1a1a !important; }
+        .shake-forever { animation: constant-shake 0.2s infinite; }
+        @keyframes constant-shake { 0%, 100% { transform: translate(0); } 50% { transform: translate(-2px, 2px); } }
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+        .modal-box { background: #fbf8eb; padding: 30px; border: 1px solid #a1947b; }
+        body.forced-dark { background-color: #0a0a0a; color: #8a8275; }
+        #red-punishment-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; color: #f00; font-size: 30px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-
     <div id="survey-container">
         <div id="welcome-screen">
-            <div class="header-section">
-                <h1>口腔健康與習慣調查</h1>
-                <div class="author">芬森·亨特</div>
-                <p class="introduction">本問卷旨在調查口腔健康與衛生習慣，請依據您的習慣作答。</p>
-            </div>
-            <div class="content-section"><button class="action-btn" onclick="startSurvey()">開始作答</button></div>
+            <h1>口腔健康與習慣調查</h1>
+            <button class="action-btn" onclick="startSurvey()">開始作答</button>
         </div>
-
         <div id="question-screen" class="hidden">
-            <div class="content-section">
-                <div id="progress" class="progress-indicator"></div>
-                <div id="question-text" class="question-text"></div>
-                <div id="options-container" class="options-list"></div>
-                <button id="next-btn" class="action-btn" onclick="nextQuestion()" disabled>下一題</button>
-            </div>
+            <div id="progress"></div>
+            <div id="question-text"></div>
+            <div id="options-container"></div>
+            <button id="next-btn" disabled onclick="nextQuestion()">下一題</button>
         </div>
     </div>
+    
+    <div id="hint-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div id="modal-content"></div>
+            <button onclick="closeModal()">關閉</button>
+        </div>
+    </div>
+    
+    <div id="red-punishment-screen" class="hidden">處罰中...</div>
 
     <script>
         const questions = [
-            { question: "1. 您刷牙的頻率如何？", options: [{ text: "餐後刷牙" }, { text: "早/晚刷牙" }, { text: "想到才刷牙" }, { text: "幾乎不刷牙" }] },
-            { question: "2. 您刷牙時是否使用牙粉？", options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }] },
-            { question: "3. 您是否使用漱口水？", options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }] },
-            { question: "4. 您是否曾罹患齲齒？", options: [{ text: "從未" }, { text: "曾罹患，已治療" }, { text: "目前罹患，未治療" }, { text: "什麼是齲齒？" }] },
-            { question: "5. 您是否固定至牙科看診？", options: [{ text: "每半年一次或更多" }, { text: "每年一次或更少" }, { text: "有狀況才看診" }, { text: "從未看過牙科" }] },
-            { question: "6. 您是否知道什麼是「根管治療」？", options: [{ text: "十分了解" }, { text: "大概知道" }, { text: "不太清楚" }, { text: "從未聽說" }] },
-            { question: "7. 您是否相信「光療法」？", options: [{ text: "深信不疑" }, { text: "相信" }, { text: "不相信" }, { text: "光療法是什麼？" }] },
-            { question: "8. 您是否相信我……？", options: [{ text: "當然" }, { text: "也許會" }, { text: "也許不會" }, { text: "拒絕相信" }] },
-            { question: "9. 您食用甜點或含糖飲料的頻率如何？", options: [{ text: "每天" }, { text: "經常" }, { text: "很少" }, { text: "幾乎沒有" }] },
-            { question: "10. 您是否接受過牙齒矯正？", options: [{ text: "正在進行" }, { text: "曾經有" }, { text: "未來計畫進行" }, { text: "不曾且無計畫接受" }] },
-            { 
-                question: "11. 您聽說過關於沼澤的「故事」嗎？",
-                isSpecialQ11: true,
-                options: [
-                    { text: "……沒有", secret: "Long long ago, a tale was born" },
-                    { text: "聽過怪物的故事", secret: "In the mist, monsters roam" },
-                    { text: "聽過牙醫的故事", secret: "A land of mystery, a hunting ground" },
-                    { text: "聽過“牙醫”的故事", secret: "Welcome to the dentist's swamp" }
-                ]
-            }
+            { question: "1. 您刷牙的頻率？", options: ["餐後", "早晚", "隨意", "不刷"] },
+            { question: "2. 是否使用牙粉？", options: ["每次", "偶爾", "不", "那是什麼"] },
+            { question: "3. 是否使用漱口水？", options: ["每天", "偶爾", "很少", "不"] },
+            { question: "4. 是否曾罹患齲齒？", options: ["從未", "已治療", "未治療", "什麼是齲齒？"], hints: [null, null, "建議就醫", "是蛀牙"] },
+            { question: "5. 是否固定看牙醫？", options: ["每半年", "每年", "有狀況才看", "從未看過"], hints: ["乖孩子", "還能更好", "不好習慣", "……"] },
+            { question: "6. 是否知道根管治療？", options: ["了解", "大概", "不清", "沒聽過"] },
+            { question: "7. 是否相信光療法？", options: ["深信", "相信", "不信", "什麼是光療法？"], isQ7: true },
+            { question: "8. 是否相信我？", options: ["當然", "也許會", "也許不會", "拒絕相信"], isQ8: true },
+            { question: "9. 甜點飲料頻率？", options: ["每天", "經常", "很少", "幾乎沒有"] },
+            { question: "10. 是否矯正？", options: ["正在", "曾經", "未來計畫", "不曾"] },
+            { question: "11. 聽過沼澤故事嗎？", options: ["……沒有", "怪物", "牙醫", "“牙醫”"], isQ11: true },
+            { question: "12. 進入診療室？", options: ["願意", "願意", "願意", "願意"], isQ12: true },
+            { question: "13. 接受檢查？", options: ["願意"], isQ13: true }
         ];
 
-        let currentQuestionIndex = 0;
-        let q11Clicked = false;
+        let cur = 0;
+        let q8Wrong = 0;
 
-        function startSurvey() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('question-screen').classList.remove('hidden');
-            loadQuestion();
-        }
+        function startSurvey() { document.getElementById('welcome-screen').classList.add('hidden'); document.getElementById('question-screen').classList.remove('hidden'); loadQ(); }
 
-        function loadQuestion() {
-            const data = questions[currentQuestionIndex];
-            document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 11`;
+        function loadQ() {
+            const data = questions[cur];
             document.getElementById('question-text').innerText = data.question;
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
-            data.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-item';
-                btn.innerText = opt.text;
-                btn.onclick = () => handleSelect(idx, btn, data);
-                container.appendChild(btn);
+            const cont = document.getElementById('options-container'); cont.innerHTML = '';
+            data.options.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = 'option-item';
+                b.innerText = opt;
+                if (data.isQ13) b.className += ' shake-forever';
+                b.onclick = () => select(i, b);
+                cont.appendChild(b);
             });
             document.getElementById('next-btn').disabled = true;
         }
 
-        function handleSelect(idx, btn, data) {
-            if (data.isSpecialQ11 && !q11Clicked) {
-                btn.innerText = data.options[idx].secret;
-                btn.classList.add('red-text-trigger');
-                q11Clicked = true;
-                document.getElementById('next-btn').disabled = false;
-                // 鎖定所有選項
-                document.querySelectorAll('.option-item').forEach(b => b.disabled = true);
-            } else if (!data.isSpecialQ11) {
-                document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                document.getElementById('next-btn').disabled = false;
+        function select(i, btn) {
+            const data = questions[cur];
+            if (data.isQ7 && i !== 0) { btn.innerText = "深信不疑"; document.getElementById('next-btn').disabled = false; }
+            else if (data.isQ8 && i !== 0) { 
+                q8Wrong++;
+                if (q8Wrong >= 2) document.body.classList.add('forced-dark');
+                if (q8Wrong >= 3) { document.getElementById('red-punishment-screen').classList.remove('hidden'); setTimeout(() => document.getElementById('red-punishment-screen').classList.add('hidden'), 2000); }
+                else { document.getElementById('modal-content').innerText = "為什麼？"; document.getElementById('hint-modal').classList.remove('hidden'); }
             }
+            else if (data.isQ11) { btn.innerText = ["Long long ago...", "Monsters roam", "Mystery land", "Welcome to swamp"][i]; btn.classList.add('red-text'); document.getElementById('next-btn').disabled = false; }
+            else if (data.isQ12) { document.getElementById('modal-content').innerText = "……非常好！"; document.getElementById('hint-modal').classList.remove('hidden'); document.getElementById('next-btn').disabled = false; }
+            else if (data.isQ13) { btn.classList.remove('shake-forever'); document.getElementById('next-btn').disabled = false; }
+            else { document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); document.getElementById('next-btn').disabled = false; }
         }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) loadQuestion();
-            else document.getElementById('question-text').innerText = "調查結束。";
-        }
+        function nextQuestion() { cur++; if(cur < questions.length) loadQ(); else alert("結束"); }
+        function closeModal() { document.getElementById('hint-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>
