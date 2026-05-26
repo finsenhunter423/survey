@@ -101,6 +101,11 @@
             font-weight: normal;
         }
 
+        /* 讓特定題目文字變紅的樣式 */
+        .question-text.warning-red {
+            color: #ff1a1a !important;
+        }
+
         /* 選項清單樣式 */
         .options-list {
             width: 100%;
@@ -308,12 +313,12 @@
             border-color: #2b251f !important;
         }
 
-        /* 第 13 題專用：選項文字與邊框固定呈現紅色 */
-        .option-item.q13-red {
+        /* 第 13 題與第 15 題專用：選項文字與邊框固定呈現紅色 */
+        .option-item.q-red {
             color: #ff1a1a !important;
             border-color: #ff1a1a !important;
         }
-        .option-item.selected.q13-red {
+        .option-item.selected.q-red {
             background-color: #2b251f !important;
             color: #ff5555 !important;
             border-color: #2b251f !important;
@@ -439,19 +444,6 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 10;
-        }
-
-        /* 保持純黑背景的全螢幕沉重低頻率震動效果 */
-        @keyframes shake-pure-black-low {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(-10px, 7px); }
-            40% { transform: translate(12px, -9px); }
-            60% { transform: translate(-8px, -5px); }
-            80% { transform: translate(9px, 8px); }
-            100% { transform: translate(0, 0); }
-        }
-        .screen-shake-pure-black {
-            animation: shake-pure-black-low 0.15s infinite ease-in-out;
         }
     </style>
 </head>
@@ -669,9 +661,17 @@
             nextBtn.innerText = '下一題'; 
             
             const currentData = questions[currentQuestionIndex];
+            const questionTextEl = document.getElementById('question-text');
             
             document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 15`;
-            document.getElementById('question-text').innerText = currentData.question;
+            questionTextEl.innerText = currentData.question;
+            
+            // 第 15 題將題目設定為紅字，其餘題目維持原樣
+            if (currentData.isSpecialQ15) {
+                questionTextEl.classList.add('warning-red');
+            } else {
+                questionTextEl.classList.remove('warning-red');
+            }
             
             const container = document.getElementById('options-container');
             container.innerHTML = '';
@@ -758,10 +758,11 @@
                     }, 800);
                 }
 
-            } else if (currentData.isSpecialQ13) {
+            } else if (currentData.isSpecialQ13 || currentData.isSpecialQ15) {
+                // 第 13 題與第 15 題的選項全部套用紅字樣式
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
-                    btn.className = 'option-item q13-red';
+                    btn.className = 'option-item q-red';
                     btn.id = `opt-${index}`;
                     btn.innerText = labels[index] + opt.text;
                     btn.onclick = () => selectOption(index);
@@ -1178,7 +1179,6 @@
         // 'No' 專屬的特效控制函數
         async function triggerNoMultiply() {
             const container = document.getElementById('no-multiply-container');
-            const trueEndScreen = document.getElementById('true-end-screen');
             const endTextEl = document.getElementById('end-message');
             container.classList.remove('hidden');
             let count = 0;
@@ -1209,19 +1209,10 @@
                             container.classList.add('hidden');
                             endTextEl.innerText = ''; 
                             
-                            // 3. 伴隨全黑畫面，發動持續 0.8 秒的低頻沉重震動
-                            trueEndScreen.classList.add('screen-shake-pure-black');
-                            
+                            // 3. 取消震動，直接進入單純黑屏維持 1 秒的狀態
                             setTimeout(() => {
-                                // 4. 震動停下後，移除震動類別
-                                trueEndScreen.classList.remove('screen-shake-pure-black');
-                                
-                                // 5. 維持純黑屏幕靜止 1 秒，之後才解析 Promise 帶入後續結局文字
-                                setTimeout(() => {
-                                    resolve();
-                                }, 1000); // 震動後的黑屏停頓時間
-                                
-                            }, 800); // 畫面震動時間
+                                resolve();
+                            }, 1000); // 靜止黑屏 1 秒
                             
                         }, 1000); // 滿屏字樣維持時間
                     }
