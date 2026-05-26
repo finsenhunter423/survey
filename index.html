@@ -434,7 +434,7 @@
                     { text: "每半年一次或更多", hint: "乖孩子……", hintId: "q5_a" },
                     { text: "每年一次或更少", hint: "還能再進步呢……", hintId: "q5_b" },
                     { text: "有狀況才看診", hint: "這並不是好習慣……", hintId: "q5_c" },
-                    { text: "從未看過牙科", hint: "為什麼不……？", hintId: "q5_d" }
+                    { text: "從未看過牙科", hint: "……", hintId: "q5_d" }
                 ]
             },
             {
@@ -568,7 +568,6 @@
                 
                 if (index !== 0) {
                     const labels = ['A. ', 'B. ', 'C. ', 'D. '];
-                    // 檢查是否已經完成過文字轉變。若已是「深信不疑」，則不再觸發震動
                     if (targetBtn.innerText === labels[index] + "深信不疑") {
                         document.getElementById('next-btn').disabled = false;
                         return;
@@ -576,12 +575,10 @@
 
                     document.getElementById('next-btn').disabled = true;
                     
-                    // 僅啟動震動效果，文字在此時完全不進行修改
                     targetBtn.classList.remove('item-shake-active');
                     void targetBtn.offsetWidth; 
                     targetBtn.classList.add('item-shake-active');
                     
-                    // 嚴格等待 0.4 秒（400ms）震動完全停止的瞬間，才改變文字並解鎖按鈕
                     setTimeout(() => {
                         targetBtn.classList.remove('item-shake-active');
                         targetBtn.innerText = labels[index] + "深信不疑";
