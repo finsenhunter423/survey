@@ -401,7 +401,7 @@
             font-size: 20px;
             text-align: center;
             outline: none;
-            width: 200px;
+            width: 250px;
             padding: 5px;
             letter-spacing: 1px;
         }
@@ -480,6 +480,7 @@
 
     </div>
 
+    <!-- 彈出視窗 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -493,10 +494,12 @@
         <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
+    <!-- 處罰畫面 -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler"></div>
     </div>
 
+    <!-- 結算畫面 -->
     <div id="true-end-screen" class="hidden">
         <div id="no-multiply-container" class="hidden"></div>
         
@@ -682,10 +685,8 @@
                     
                     if (q7TextsRevealed) {
                         btn.innerText = labels[index] + opt.final;
-                        btn.disabled = false;
                     } else {
                         btn.innerText = labels[index] + opt.initial;
-                        btn.disabled = true;
                     }
                     
                     btn.onclick = () => selectOption(index);
@@ -700,7 +701,6 @@
                             if (btn) {
                                 btn.classList.add('glitch-active');
                                 btn.innerText = labels[index] + opt.final;
-                                btn.disabled = false;
                                 setTimeout(() => btn.classList.remove('glitch-active'), 250);
                             }
                         });
@@ -762,10 +762,8 @@
                     
                     if (q12TextsRevealed) {
                         btn.innerText = labels[index] + opt.final;
-                        btn.disabled = false;
                     } else {
                         btn.innerText = labels[index] + opt.initial;
-                        btn.disabled = true;
                     }
                     
                     btn.onclick = () => selectOption(index);
@@ -780,7 +778,6 @@
                             if (btn) {
                                 btn.classList.add('glitch-active');
                                 btn.innerText = labels[index] + opt.final;
-                                btn.disabled = false;
                                 setTimeout(() => btn.classList.remove('glitch-active'), 250);
                             }
                         });
@@ -1108,7 +1105,7 @@
             const btn = document.getElementById('final-submit');
             
             if (isRestrictedToYes) {
-                if (inputVal.toLowerCase() === 'yes') {
+                if (inputVal.trim().toLowerCase() === 'yes') {
                     btn.disabled = false;
                 } else {
                     btn.disabled = true;
@@ -1129,7 +1126,8 @@
             if (btn.disabled) return; 
 
             const endTextEl = document.getElementById('end-message');
-            let val = inputEl.value.trim().toLowerCase();
+            // 將輸入轉為小寫並將連續空白替換為單一空白
+            let val = inputEl.value.trim().toLowerCase().replace(/\s+/g, ' ');
             
             inputEl.disabled = true;
             btn.disabled = true;
@@ -1146,38 +1144,61 @@
                     await showFinalEnding("Now, you can never escape again…");
                     break;
                 case 'help':
-                    endTextEl.innerText = "You scare me?"; await wait(2000);
-                    endTextEl.innerText = "Don' be afraid, darling…"; await wait(2000);
-                    endTextEl.innerText = "I never hurt anyone…"; await wait(2000);
-                    endTextEl.innerText = "Come to me…"; await wait(2000);
-                    await showFinalEnding(" RIGHT NOW");
+                    endTextEl.innerText = "You scare me?"; await wait(3000);
+                    endTextEl.innerText = "Don' be afraid, darling…"; await wait(3000);
+                    endTextEl.innerText = "I never hurt anyone…"; await wait(3000);
+                    endTextEl.innerText = "Come to me…"; await wait(3000);
+                    await showFinalEnding("Right now");
                     break;
                 case 'finsen':
-                    endTextEl.innerText = "You remember my name?"; await wait(2000);
-                    endTextEl.innerText = "That's glad to me…"; await wait(2000);
+                    endTextEl.innerText = "You remember my name?"; await wait(3000);
+                    endTextEl.innerText = "I'm so glad…"; await wait(3000);
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
                 case 'hunter':
-                    endTextEl.innerText = "Want to know what I am hunting?"; await wait(2000);
-                    endTextEl.innerText = "Come here, you'll get the answer…"; await wait(2000);
+                    endTextEl.innerText = "Want to know what I am hunting?"; await wait(3000);
+                    endTextEl.innerText = "Come here, you'll get the answer…"; await wait(3000);
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
+                case 'finsen hunter':
+                    endTextEl.innerText = "A sinner?"; await wait(3000);
+                    endTextEl.innerText = "A Mutilator?"; await wait(3000);
+                    await showFinalEnding("Or the Asclepius, who vanished in the swamp…");
+                    break;
                 case 'light':
-                    endTextEl.innerText = "It will cure diseases…"; await wait(2000);
-                    endTextEl.innerText = "You really should trust me…"; await wait(2000);
+                    endTextEl.innerText = "It will cure diseases…"; await wait(3000);
+                    endTextEl.innerText = "You really should trust me…"; await wait(3000);
                     await showFinalEnding("It’s such a work of art!");
                     break;
                 case 'swamp':
-                    endTextEl.innerText = "Such a dark place, isn't it?"; await wait(2000);
-                    endTextEl.innerText = "But it doesn't matter…"; await wait(2000);
-                    endTextEl.innerText = "The enlightenment will be brought to here…"; await wait(2000);
-                    await showFinalEnding("Let's witness it together, shall we?");
+                    endTextEl.innerText = "Such a dark place, isn't it?"; await wait(3000);
+                    endTextEl.innerText = "But it doesn't matter…"; await wait(3000);
+                    endTextEl.innerText = "The enlightenment will be brought to here…"; await wait(3000);
+                    await showFinalEnding("Let us witness it together, shall we?");
+                    break;
+                case 'teeth':
+                case 'tooth':
+                    endTextEl.innerText = "The shiny white I pursue…"; await wait(3000);
+                    endTextEl.innerText = "The most beautiful color I've seen…"; await wait(3000);
+                    await showFinalEnding("So pure, so innocent…");
+                    break;
+                case 'darling':
+                case 'dear':
+                    endTextEl.innerText = "My dear, don't run…"; await wait(3000);
+                    endTextEl.innerText = "Trust me, I mean no harm…"; await wait(3000);
+                    endTextEl.innerText = "Are you afraid to look at me, darling?"; await wait(3000);
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
+                case 'truth':
+                    endTextEl.innerText = "I keep going to search, with my decaying body."; await wait(3000);
+                    endTextEl.innerText = "Nothing can stop my stpes…"; await wait(3000);
+                    await showFinalEnding("I will find it.");
                     break;
                 default:
                     endTextEl.innerText = "Don't you reject me…";
                     await wait(2000);
-                    endTextEl.innerText = "Stay with me, would you?";
                     
+                    endTextEl.innerText = "";
                     inputEl.value = '';
                     inputEl.disabled = false;
                     document.getElementById('end-input-area').style.display = 'flex';
@@ -1221,7 +1242,7 @@
                             
                             setTimeout(() => {
                                 resolve();
-                            }, 1000); 
+                            }, 10); 
                             
                         }, 1000); 
                     }
