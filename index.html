@@ -221,6 +221,11 @@
             font-style: italic;
         }
 
+        /* 第 8 題專用：二次錯誤時提示文字變紅的樣式 */
+        .modal-text.warning-red {
+            color: #ff1a1a !important;
+        }
+
         /* 全黑過場遮罩 */
         .blackout-overlay {
             position: fixed;
@@ -264,28 +269,13 @@
             margin: 0;
         }
 
-        /* 第8題特殊效果：紅色滿版文字劇烈震動動畫 */
-        @keyframes text-heavy-shake {
-            0% { transform: translate(0, 0); }
-            10% { transform: translate(-12px, 8px) rotate(-1deg); }
-            20% { transform: translate(14px, -9px) rotate(1deg); }
-            30% { transform: translate(-10px, -4px) rotate(-1.5deg); }
-            40% { transform: translate(13px, 9px) rotate(1.5deg); }
-            50% { transform: translate(-12px, 5px) rotate(-1deg); }
-            60% { transform: translate(11px, -7px) rotate(1deg); }
-            70% { transform: translate(-13px, 6px) rotate(-2deg); }
-            80% { transform: translate(12px, -4px) rotate(1.5deg); }
-            90% { transform: translate(-8px, 9px) rotate(-1deg); }
-            100% { transform: translate(0, 0); }
-        }
-
         .text-filler {
             width: 120%;
             height: 120%;
             margin-left: -10%;
             margin-top: -5%;
             text-align: justify;
-            animation: text-heavy-shake 0.15s infinite linear;
+            /* 移除 text-heavy-shake 動畫，使其恢復靜止 */
         }
 
         /* 1.5秒選項閃爍變形動畫 */
@@ -301,7 +291,7 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
-        /* 第7題專用：更高頻率、時間回調（0.4秒）的選項抖動效果 */
+        /* 第7題專用：高頻率、持續 0.4 秒的選項抖動效果 */
         @keyframes item-shake {
             0% { transform: translateX(0); }
             10% { transform: translateX(-8px); }
@@ -580,7 +570,6 @@
                 if (index !== 0) {
                     document.getElementById('next-btn').disabled = true;
                     
-                    // 高頻率震動效果（持續0.4秒）
                     targetBtn.classList.remove('item-shake-active');
                     void targetBtn.offsetWidth; 
                     targetBtn.classList.add('item-shake-active');
@@ -591,7 +580,7 @@
                         targetBtn.innerText = labels[index] + "深信不疑";
                         
                         document.getElementById('next-btn').disabled = false;
-                    }, 400); // 延時與動畫同步回調為 400ms
+                    }, 400); 
                 } else {
                     document.getElementById('next-btn').disabled = false;
                 }
@@ -610,12 +599,18 @@
                     shouldShowHint = true;
                 }
 
+                const modalContent = document.getElementById('modal-content');
+                // 預設先移除紅字警告樣式
+                modalContent.classList.remove('warning-red');
+
                 if (q8WrongCount === 1) {
-                    document.getElementById('modal-content').innerText = shouldShowHint ? hint : "……為什麼？";
+                    modalContent.innerText = shouldShowHint ? hint : "……為什麼？";
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount === 2) {
                     document.body.classList.add('forced-dark');
-                    document.getElementById('modal-content').innerText = shouldShowHint ? hint : "為什麼？";
+                    modalContent.innerText = shouldShowHint ? hint : "為什麼？";
+                    // 核心調整：二次錯誤時加入紅字樣式類別
+                    modalContent.classList.add('warning-red');
                     document.getElementById('hint-modal').classList.remove('hidden');
                 } else if (q8WrongCount >= 3) {
                     const punishText = (index === 1) ? "還不夠" : "為什麼";
@@ -657,6 +652,8 @@
 
         function closeModal() {
             document.getElementById('hint-modal').classList.add('hidden');
+            // 關閉彈窗時順便把紅字樣式清除以供後續重設
+            document.getElementById('modal-content').classList.remove('warning-red');
             const currentData = questions[currentQuestionIndex];
             
             if (currentData.isSpecialQ8) {
