@@ -406,7 +406,7 @@
     </div>
 
     <div id="blackout-screen" class="blackout-overlay hidden">
-        <div id="blackout-content" class="blackout-text">這就對了</div>
+        <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
     <div id="red-punishment-screen" class="hidden">
@@ -487,10 +487,10 @@
                 question: "12. 您是否願意進入「診療室」", 
                 isSpecialQ12: true,
                 options: [
-                    { text: "願意", hasTriggered: false }, 
-                    { text: "願意", hasTriggered: false }, 
-                    { text: "願意", hasTriggered: false }, 
-                    { text: "願意", hasTriggered: false }
+                    { text: "願意" }, 
+                    { text: "願意" }, 
+                    { text: "願意" }, 
+                    { text: "願意" }
                 ] 
             },
             { question: "13. （等待題目更新...）", options: [{text:"選項A"}, {text:"選項B"}, {text:"選項C"}, {text:"選項D"}] },
@@ -577,7 +577,6 @@
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
                     btn.id = `opt-${index}`;
-                    // 初始化時需考慮是否已經被揭露過
                     if (opt.hasRevealed) {
                         btn.innerText = labels[index] + opt.revealed;
                         btn.classList.add('q11-revealed');
@@ -705,7 +704,7 @@
                 return;
             }
 
-            // 第 12 題特殊處理分支
+            // 第 12 題特殊處理分支（取消提示框，直接選取並解鎖下一題）
             if (currentData.isSpecialQ12) {
                 selectedOptionIndex = index;
                 const items = document.querySelectorAll('.option-item');
@@ -716,20 +715,7 @@
                         item.classList.remove('selected');
                     }
                 });
-                
-                const optData = currentData.options[index];
-                if (!optData.hasTriggered) {
-                    // 首次點擊，觸發提示框
-                    optData.hasTriggered = true;
-                    const modalContent = document.getElementById('modal-content');
-                    modalContent.innerText = "……非常好！";
-                    // 移除 warning-red 樣式，保持原本的古典風格顏色
-                    modalContent.classList.remove('warning-red');
-                    document.getElementById('hint-modal').classList.remove('hidden');
-                } else {
-                    // 已觸發過，直接解鎖下一題
-                    document.getElementById('next-btn').disabled = false;
-                }
+                document.getElementById('next-btn').disabled = false;
                 return;
             }
 
@@ -776,7 +762,7 @@
             
             if (currentData.isSpecialQ7) {
                 const blackout = document.getElementById('blackout-screen');
-                document.getElementById('blackout-content').innerText = "這就對了";
+                document.getElementById('blackout-content').innerText = "非常好……";
                 blackout.classList.remove('hidden');
                 
                 setTimeout(() => {
