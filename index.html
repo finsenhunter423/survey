@@ -223,7 +223,7 @@
             color: #ff1a1a !important;
         }
 
-        /* 全黑過場遮罩 */
+        /* 過場遮罩 */
         .blackout-overlay {
             position: fixed;
             top: 0;
@@ -362,6 +362,92 @@
         .hidden {
             display: none !important;
         }
+
+        /* ======== 全新結算畫面樣式 ======== */
+        #true-end-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            transition: background-color 2.5s ease;
+        }
+
+        #end-message {
+            color: #ff1a1a;
+            font-size: 26px;
+            font-style: italic;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-align: center;
+            transition: opacity 0.5s;
+        }
+
+        #end-input-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #final-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #ff1a1a;
+            color: #ff1a1a;
+            font-family: inherit;
+            font-size: 20px;
+            text-align: center;
+            outline: none;
+            width: 200px;
+            padding: 5px;
+            letter-spacing: 1px;
+        }
+
+        #final-input::placeholder {
+            color: #550000;
+            opacity: 1;
+        }
+
+        #final-submit {
+            background: transparent;
+            border: 1px solid #ff1a1a;
+            color: #ff1a1a;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 5px 20px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        #final-submit:hover:not(:disabled) {
+            background: #ff1a1a;
+            color: #000000;
+        }
+
+        #final-submit:disabled {
+            border-color: #550000;
+            color: #550000;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        #no-multiply-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -396,16 +482,6 @@
             </div>
         </div>
 
-        <div id="end-screen" class="hidden">
-            <div class="header-section">
-                <h1>調查結束</h1>
-                <div class="author">芬森·亨特</div>
-                <p class="introduction" style="text-align: center;">
-                    感謝您的參與。數據已記錄。
-                </p>
-            </div>
-        </div>
-
     </div>
 
     <div id="hint-modal" class="modal-overlay hidden">
@@ -423,6 +499,22 @@
 
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler" class="text-filler"></div>
+    </div>
+
+    <div id="true-end-screen" class="hidden">
+        <div id="no-multiply-container" class="hidden"></div>
+        
+        <div id="end-content-wrapper">
+            <div id="end-message">Stay with me, would you?</div>
+            <div id="end-input-area">
+                <input type="text" id="final-input" placeholder="Yes" oninput="checkFinalInput()">
+                <button id="final-submit" onclick="submitFinal()">→</button>
+            </div>
+        </div>
+
+        <div id="restart-container" class="hidden">
+            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">重新填寫</button>
+        </div>
     </div>
 
     <script>
@@ -850,7 +942,6 @@
             }
         }
 
-        // 第 15 題專用提示框與按鈕建立
         function showQ15Modal() {
             const modalContent = document.getElementById('modal-content');
             modalContent.innerText = "真的嗎？";
@@ -883,32 +974,27 @@
             const blackout = document.getElementById('blackout-screen');
             const blackoutContent = document.getElementById('blackout-content');
             blackoutContent.innerText = "Pretty well, my dear";
-            blackoutContent.style.color = "#ff1a1a"; // 紅字顯示
+            blackoutContent.style.color = "#ff1a1a";
             blackout.classList.remove('hidden');
             
-            // 全黑畫面持續時間修改為 3 秒 (3000毫秒)
             setTimeout(() => {
                 blackout.classList.add('hidden');
-                blackoutContent.style.color = "#ffffff"; // 還原色系
+                blackoutContent.style.color = "#ffffff";
                 proceedToNext();
             }, 3000);
         }
 
         function handleQ15Dot(trueBtn, dotBtn) {
-            // 按鈕震動特效
             dotBtn.classList.remove('item-shake-active');
             void dotBtn.offsetWidth;
             dotBtn.classList.add('item-shake-active');
             
-            // 紅字提示轉為「……」
             const modalContent = document.getElementById('modal-content');
             modalContent.innerText = "……";
             
-            // 底下按鈕皆不可選
             trueBtn.disabled = true;
             dotBtn.disabled = true;
             
-            // 2秒後提示文字恢復，且只留下「真的」按鈕
             setTimeout(() => {
                 dotBtn.classList.remove('item-shake-active');
                 modalContent.innerText = "真的嗎？";
@@ -924,7 +1010,6 @@
         function closeModal() {
             const currentData = questions[currentQuestionIndex];
             
-            // 第 14 題：分兩階段點選邏輯
             if (currentData.isSpecialQ14) {
                 if (q14ModalStage === 1) {
                     q14ModalStage = 2;
@@ -941,7 +1026,6 @@
                 }
             }
 
-            // 一般關閉邏輯
             document.getElementById('hint-modal').classList.add('hidden');
             document.getElementById('modal-content').classList.remove('warning-red');
             restoreDefaultModalBtn();
@@ -956,7 +1040,6 @@
         function nextQuestion() {
             const currentData = questions[currentQuestionIndex];
 
-            // 第 14 題邏輯：直接點按觸發強迫提示框流程
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
                 const modalContent = document.getElementById('modal-content');
@@ -1000,9 +1083,158 @@
             }
         }
 
+        // ================= 新版結算畫面邏輯 =================
+        const wait = ms => new Promise(res => setTimeout(res, ms));
+        let isRestrictedToYes = false;
+
         function showEndScreen() {
-            document.getElementById('question-screen').classList.add('hidden');
-            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('survey-container').classList.add('hidden');
+            document.getElementById('true-end-screen').classList.remove('hidden');
+            
+            // Focus on the final input to encourage user typing
+            setTimeout(() => {
+                document.getElementById('final-input').focus();
+            }, 100);
+        }
+
+        function checkFinalInput() {
+            const inputVal = document.getElementById('final-input').value;
+            const btn = document.getElementById('final-submit');
+            
+            if (isRestrictedToYes) {
+                // 如果進入限制狀態，只有打 Yes/yes 才能按箭頭
+                if (inputVal.toLowerCase() === 'yes') {
+                    btn.disabled = false;
+                } else {
+                    btn.disabled = true;
+                }
+            }
+        }
+
+        async function submitFinal() {
+            const inputEl = document.getElementById('final-input');
+            const btn = document.getElementById('final-submit');
+            const endTextEl = document.getElementById('end-message');
+            
+            let val = inputEl.value.trim().toLowerCase();
+            
+            // 進入判定時，鎖定輸入與按鈕，隱藏輸入區
+            inputEl.disabled = true;
+            btn.disabled = true;
+            document.getElementById('end-input-area').style.display = 'none';
+
+            switch(val) {
+                case 'yes':
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
+                case 'no':
+                    endTextEl.innerText = "Why not?";
+                    await wait(1000);
+                    await triggerNoMultiply();
+                    await showFinalEnding("Now, you can never escape again…");
+                    break;
+                case 'help':
+                    endTextEl.innerText = "You scare me?"; await wait(2000);
+                    endTextEl.innerText = "Don' be afraid, darling…"; await wait(2000);
+                    endTextEl.innerText = "I never hurt anyone…"; await wait(2000);
+                    endTextEl.innerText = "Come to me…"; await wait(2000);
+                    await showFinalEnding(" RIGHT NOW");
+                    break;
+                case 'finsen':
+                    endTextEl.innerText = "You remember my name?"; await wait(2000);
+                    endTextEl.innerText = "That's glad to me…"; await wait(2000);
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
+                case 'hunter':
+                    endTextEl.innerText = "Want to know what I am hunting?"; await wait(2000);
+                    endTextEl.innerText = "Come here, you'll get the answer…"; await wait(2000);
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
+                case 'light':
+                    endTextEl.innerText = "It will cure diseases…"; await wait(2000);
+                    endTextEl.innerText = "You really should trust me…"; await wait(2000);
+                    await showFinalEnding("It’s such a work of art!");
+                    break;
+                case 'swamp':
+                    endTextEl.innerText = "Such a dark place, isn't it?"; await wait(2000);
+                    endTextEl.innerText = "But it doesn't matter…"; await wait(2000);
+                    endTextEl.innerText = "The enlightenment will be brought to here…"; await wait(2000);
+                    await showFinalEnding("Let's witness it together, shall we?");
+                    break;
+                default:
+                    // 觸發限制迴圈
+                    endTextEl.innerText = "Don't you reject me…";
+                    await wait(2000);
+                    endTextEl.innerText = "Stay with me, would you?";
+                    
+                    // 恢復輸入框
+                    inputEl.value = '';
+                    inputEl.disabled = false;
+                    document.getElementById('end-input-area').style.display = 'flex';
+                    
+                    isRestrictedToYes = true;
+                    checkFinalInput(); // 觸發檢查，確保按鈕變灰
+                    inputEl.focus();
+                    break;
+            }
+        }
+
+        // 'No' 專屬的全螢幕擴散動畫
+        async function triggerNoMultiply() {
+            const container = document.getElementById('no-multiply-container');
+            container.classList.remove('hidden');
+            let count = 0;
+            
+            return new Promise(resolve => {
+                const interval = setInterval(() => {
+                    const span = document.createElement('span');
+                    span.innerText = "Why not?";
+                    span.style.position = 'absolute';
+                    span.style.color = '#ff1a1a';
+                    // 隨機字體大小
+                    span.style.fontSize = (Math.random() * 40 + 16) + 'px'; 
+                    // 隨機螢幕座標
+                    span.style.left = (Math.random() * 100) + 'vw';
+                    span.style.top = (Math.random() * 100) + 'vh';
+                    span.style.whiteSpace = 'nowrap';
+                    span.style.transform = 'translate(-50%, -50%)';
+                    span.style.fontWeight = 'bold';
+                    span.style.zIndex = count; // 重疊順序
+                    container.appendChild(span);
+                    count++;
+                    
+                    // 從開始快速增加直至充滿螢幕 (約3秒內生成300個)
+                    if (count > 300) { 
+                        clearInterval(interval);
+                        // 螢幕充滿後持續 5 秒
+                        setTimeout(() => {
+                            container.innerHTML = '';
+                            container.classList.add('hidden');
+                            resolve();
+                        }, 5000);
+                    }
+                }, 10);
+            });
+        }
+
+        // 通用結局文字展示與最終轉場
+        async function showFinalEnding(text) {
+            const endTextEl = document.getElementById('end-message');
+            endTextEl.innerText = text;
+            
+            // 結局文字顯示 5 秒
+            await wait(5000);
+            
+            // 畫面慢慢轉回原色調 (利用 CSS transition 控制背景變化)
+            endTextEl.innerText = ""; // 文字消失
+            const trueEndScreen = document.getElementById('true-end-screen');
+            trueEndScreen.style.backgroundColor = "#f4edd2"; 
+            
+            // 等待漸變動畫完成 (設定約 2.5 秒)
+            await wait(2500); 
+            
+            // 只留下「重新填寫」的按鈕
+            document.getElementById('restart-container').classList.remove('hidden');
         }
     </script>
 
