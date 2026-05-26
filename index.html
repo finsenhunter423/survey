@@ -441,23 +441,22 @@
             z-index: 10;
         }
 
-        /* 全螢幕劇烈震動伴隨紅色背景特效 (持續1秒) */
-        @keyframes shake-red-flicker {
-            0% { transform: translate(0, 0); background-color: #ff0000; }
-            10% { transform: translate(-10px, 8px); background-color: #d60000; }
-            20% { transform: translate(12px, -10px); background-color: #ff1a1a; }
-            30% { transform: translate(-8px, -5px); background-color: #b30000; }
-            40% { transform: translate(10px, 12px); background-color: #ff0000; }
-            50% { transform: translate(-12px, 6px); background-color: #e60000; }
-            60% { transform: translate(7px, -9px); background-color: #ff1a1a; }
-            70% { transform: translate(-10px, 10px); background-color: #990000; }
-            80% { transform: translate(9px, -6px); background-color: #ff0000; }
-            90% { transform: translate(-6px, -10px); background-color: #e60000; }
-            100% { transform: translate(0, 0); background-color: #ff0000; }
+        /* 保持純黑背景的全螢幕劇烈震動效果 */
+        @keyframes shake-pure-black {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-12px, 9px); }
+            20% { transform: translate(14px, -11px); }
+            30% { transform: translate(-9px, -6px); }
+            40% { transform: translate(11px, 13px); }
+            50% { transform: translate(-13px, 7px); }
+            60% { transform: translate(8px, -10px); }
+            70% { transform: translate(-11px, 11px); }
+            80% { transform: translate(10px, -7px); }
+            90% { transform: translate(-7px, -11px); }
+            100% { transform: translate(0, 0); }
         }
-        .screen-shake-red {
-            animation: shake-red-flicker 0.1s infinite;
-            background-color: #ff0000 !important;
+        .screen-shake-pure-black {
+            animation: shake-pure-black 0.08s infinite;
         }
     </style>
 </head>
@@ -1181,7 +1180,7 @@
             }
         }
 
-        // 'No' 專屬的全螢幕擴散與畫面紅閃震動動畫
+        // 'No' 專屬的特效控制函數
         async function triggerNoMultiply() {
             const container = document.getElementById('no-multiply-container');
             const trueEndScreen = document.getElementById('true-end-screen');
@@ -1207,21 +1206,22 @@
                     if (count > 300) { 
                         clearInterval(interval);
                         
-                        // 2秒後清除文字，並發動為時1秒的畫面震動與紅閃效果
+                        // 1. 滿屏後，保持滿屏狀態持續 1 秒
                         setTimeout(() => {
+                            // 2. 清空所有的 Why not? 字樣
                             container.innerHTML = '';
                             container.classList.add('hidden');
                             
-                            // 套用紅閃震動類別
-                            trueEndScreen.classList.add('screen-shake-red');
+                            // 3. 保持純黑底色，但立刻附加持續 0.8 秒的畫面震動
+                            trueEndScreen.classList.add('screen-shake-pure-black');
                             
-                            // 持續 1 秒後移除效果，恢復原本的黑底狀態並結束Promise
                             setTimeout(() => {
-                                trueEndScreen.classList.remove('screen-shake-red');
+                                // 4. 結束震動後，移除類別並解析 Promise，進入結局文字
+                                trueEndScreen.classList.remove('screen-shake-pure-black');
                                 resolve();
-                            }, 1000);
+                            }, 800); // 畫面震動持續 0.8 秒
                             
-                        }, 2000);
+                        }, 1000); // 滿屏字樣維持 1 秒
                     }
                 }, 10);
             });
