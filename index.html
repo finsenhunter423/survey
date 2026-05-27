@@ -630,10 +630,9 @@
         const triggeredHints = {};
 
         function startSurvey() {
-            // 播放背景音樂
             const music = document.getElementById('bg-music');
             if(music) {
-                music.volume = 0.2; // 調整背景音樂音量（範圍 0.0 ~ 1.0）
+                music.volume = 0.25; 
                 music.play().catch(error => {
                     console.log("瀏覽器阻擋了自動播放，需要使用者互動後才可啟動");
                 });
@@ -764,7 +763,6 @@
         function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
             
-            // 第 7 題 與 第 12 題
             if (currentData.isSpecialQ7 || currentData.isSpecialQ12) {
                 selectedOptionIndex = index;
                 currentData.options[index].hasRevealed = true;
@@ -782,7 +780,6 @@
                     
                     if (idx === index) {
                         item.classList.add('selected');
-                        // 僅當選擇的不是第一個選項 (A選項) 時才觸發震動
                         if (index !== 0) {
                             item.classList.remove('item-shake-active');
                             void item.offsetWidth;
@@ -796,7 +793,6 @@
                 return;
             }
             
-            // 第 8 題
             if (currentData.isSpecialQ8 && index !== 0) {
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
@@ -836,7 +832,6 @@
                 return;
             }
 
-            // 第 11 題
             if (currentData.isSpecialQ11) {
                 selectedOptionIndex = index;
                 currentData.options[index].hasRevealed = true;
@@ -866,7 +861,6 @@
                 return;
             }
 
-            // 第 15 題
             if (currentData.isSpecialQ15) {
                 selectedOptionIndex = index;
                 const items = document.querySelectorAll('.option-item');
@@ -881,7 +875,6 @@
                 return;
             }
 
-            // 一般題目與第 13 題
             selectedOptionIndex = index;
             const items = document.querySelectorAll('.option-item');
             items.forEach((item, idx) => {
@@ -1096,17 +1089,23 @@
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
                 case 'no':
+                    // 【新增效果】觸發後立刻停止背景音樂
+                    const bgMusic = document.getElementById('bg-music');
+                    if (bgMusic) {
+                        bgMusic.pause();
+                    }
+
                     endTextEl.innerText = "Why not?";
                     await wait(1000);
                     await triggerNoMultiply();
                     
-                    // 【新增效果】滿屏字樣消失後的黑屏期間播放特製音效
+                    // 滿屏字樣消失後的黑屏期間播放特製音效
                     const sfxNo = document.getElementById('se-no');
                     if (sfxNo) {
-                        sfxNo.volume = 0.8; // 設定專屬音效音量為 80%
+                        sfxNo.volume = 0.8; 
                         sfxNo.play().catch(e => console.log("音效自動播放受阻或路徑有誤:", e));
                     }
-                    await wait(2000); // 讓音效與純黑畫面持續 2 秒鐘
+                    await wait(2000); 
                     
                     await showFinalEnding("Now, you can never escape again…");
                     break;
