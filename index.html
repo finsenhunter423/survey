@@ -508,6 +508,10 @@
         <source src="The Dentist's Theme.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="se-no">
+        <source src="mix_00s (audio-joiner.com).mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const questions = [
             {
@@ -629,7 +633,7 @@
             // 播放背景音樂
             const music = document.getElementById('bg-music');
             if(music) {
-                music.volume = 0.5; // 可調整音量
+                music.volume = 0.4; // 調整背景音樂音量（範圍 0.0 ~ 1.0）
                 music.play().catch(error => {
                     console.log("瀏覽器阻擋了自動播放，需要使用者互動後才可啟動");
                 });
@@ -732,8 +736,8 @@
                         btn.classList.add('q11-revealed');
                     } else {
                         btn.innerText = labels[index] + opt.initial;
+                        btn.onclick = () => selectOption(index);
                     }
-                    btn.onclick = () => selectOption(index);
                     container.appendChild(btn);
                 });
             } else if (currentData.isSpecialQ13 || currentData.isSpecialQ15) {
@@ -1095,6 +1099,15 @@
                     endTextEl.innerText = "Why not?";
                     await wait(1000);
                     await triggerNoMultiply();
+                    
+                    // 【新增效果】滿屏字樣消失後的黑屏期間播放特製音效
+                    const sfxNo = document.getElementById('se-no');
+                    if (sfxNo) {
+                        sfxNo.volume = 0.8; // 設定專屬音效音量為 80%
+                        sfxNo.play().catch(e => console.log("音效自動播放受阻或路徑有誤:", e));
+                    }
+                    await wait(2000); // 讓音效與純黑畫面持續 2 秒鐘
+                    
                     await showFinalEnding("Now, you can never escape again…");
                     break;
                 case 'help':
