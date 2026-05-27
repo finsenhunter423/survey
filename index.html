@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一份調查報告，似乎是未設計完成的問卷</title>
+    <title>一份調查報告，似乎是未設計完成的問卷，</title>
     <style>
         /* 19世紀簡約古典風格 */
         body {
@@ -48,17 +48,24 @@
             text-align: center;
             margin-bottom: 40px;
             border-bottom: 1px double #a1947b;
-            padding: 20px 0 30px 0; /* 調整取消標題後的間距 */
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
         }
 
         .introduction {
-            font-size: 18px; /* 略微放大副標題字體 */
+            font-size: 15px;
             line-height: 1.8;
             color: #4a3f35;
             max-width: 450px;
             margin: 0 auto;
-            text-align: center;
-            font-style: italic;
+            text-align: justify;
         }
 
         /* 互動區域 */
@@ -158,6 +165,13 @@
             color: #fbf8eb;
         }
 
+        button.action-btn:disabled {
+            border-color: #d3c9b3;
+            color: #a1947b;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         /* 古典風格提示框 */
         .modal-overlay {
             position: fixed;
@@ -202,6 +216,10 @@
             font-style: italic;
         }
 
+        .modal-text.warning-red {
+            color: #ff1a1a !important;
+        }
+
         /* 過場遮罩 */
         .blackout-overlay {
             position: fixed;
@@ -241,6 +259,8 @@
             justify-content: center;
             align-items: center;
             user-select: none;
+            padding: 0;
+            margin: 0;
         }
 
         /* 變形動畫 */
@@ -642,121 +662,268 @@
             if (currentData.isSpecialQ14) {
                 nextBtn.innerText = '……選項呢？';
                 nextBtn.disabled = false;
-            } else {
+            } else if (currentData.isSpecialQ7) {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-item';
+                    btn.id = `q7-opt-${index}`;
                     
-                    if (currentData.isSpecialQ7) {
-                        btn.innerText = labels[index] + (opt.hasRevealed ? opt.final : opt.initial);
-                    } else if (currentData.isSpecialQ8) {
-                        if (disabledOptionsQ8[index] || q8TextsRevealed) {
-                            btn.innerText = labels[index] + opt.final;
-                            if (disabledOptionsQ8[index]) btn.disabled = true;
-                        } else {
-                            btn.innerText = labels[index] + opt.initial;
-                        }
-                    } else if (currentData.isSpecialQ11) {
-                        if (opt.hasRevealed) {
-                            btn.innerText = labels[index] + opt.revealed;
-                            btn.classList.add('q11-revealed');
-                        } else {
-                            btn.innerText = labels[index] + opt.initial;
-                        }
-                    } else if (currentData.isSpecialQ12) {
-                        btn.innerText = labels[index] + (q12TextsRevealed ? opt.final : opt.initial);
-                    } else if (currentData.isSpecialQ13 || currentData.isSpecialQ15) {
-                        btn.innerText = labels[index] + opt.text;
-                        btn.classList.add('q-red');
+                    if (opt.hasRevealed) {
+                        btn.innerText = labels[index] + opt.final;
                     } else {
-                        btn.innerText = labels[index] + opt.text;
+                        btn.innerText = labels[index] + opt.initial;
+                    }
+                    
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+
+            } else if (currentData.isSpecialQ8) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `q8-opt-${index}`;
+                    
+                    if (disabledOptionsQ8[index]) {
+                        btn.innerText = labels[index] + opt.final;
+                        btn.disabled = true;
+                    } else if (q8TextsRevealed) {
+                        btn.innerText = labels[index] + opt.final;
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
                     }
                     
                     btn.onclick = () => selectOption(index, opt.hint, opt.hintId);
                     container.appendChild(btn);
                 });
 
-                if (currentData.isSpecialQ8 && !q8TextsRevealed) {
+                if (!q8TextsRevealed) {
                     q8Timer = setTimeout(() => {
                         q8TextsRevealed = true;
-                        document.querySelectorAll('.option-item').forEach((btn, i) => {
-                            if (!disabledOptionsQ8[i]) {
+                        currentData.options.forEach((opt, index) => {
+                            const btn = document.getElementById(`q8-opt-${index}`);
+                            if (btn && !disabledOptionsQ8[index]) {
                                 btn.classList.add('glitch-active');
-                                btn.innerText = labels[i] + currentData.options[i].final;
+                                btn.innerText = labels[index] + opt.final;
                                 setTimeout(() => btn.classList.remove('glitch-active'), 250);
                             }
                         });
                     }, 800);
                 }
 
-                if (currentData.isSpecialQ12 && !q12TextsRevealed) {
+            } else if (currentData.isSpecialQ11) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `opt-${index}`;
+                    if (opt.hasRevealed) {
+                        btn.innerText = labels[index] + opt.revealed;
+                        btn.classList.add('q11-revealed');
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
+                    }
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+            } else if (currentData.isSpecialQ12) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `q12-opt-${index}`;
+                    
+                    if (q12TextsRevealed) {
+                        btn.innerText = labels[index] + opt.final;
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
+                    }
+                    
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+
+                if (!q12TextsRevealed) {
                     q12Timer = setTimeout(() => {
                         q12TextsRevealed = true;
-                        document.querySelectorAll('.option-item').forEach((btn, i) => {
-                            btn.classList.add('glitch-active');
-                            btn.innerText = labels[i] + currentData.options[i].final;
-                            setTimeout(() => btn.classList.remove('glitch-active'), 250);
+                        currentData.options.forEach((opt, index) => {
+                            const btn = document.getElementById(`q12-opt-${index}`);
+                            if (btn) {
+                                btn.classList.add('glitch-active');
+                                btn.innerText = labels[index] + opt.final;
+                                setTimeout(() => btn.classList.remove('glitch-active'), 250);
+                            }
                         });
-                    }, 1500);
+                    }, 1500); 
                 }
+
+            } else if (currentData.isSpecialQ13 || currentData.isSpecialQ15) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item q-red';
+                    btn.id = `opt-${index}`;
+                    btn.innerText = labels[index] + opt.text;
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+            } else {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item';
+                    btn.id = `opt-${index}`;
+                    btn.innerText = labels[index] + opt.text;
+                    btn.onclick = () => selectOption(index, opt.hint, opt.hintId);
+                    container.appendChild(btn);
+                });
             }
         }
 
         function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
             
+            // 第 7 題
             if (currentData.isSpecialQ7) {
                 selectedOptionIndex = index;
                 currentData.options[index].hasRevealed = true;
+                
+                const items = document.querySelectorAll('.option-item');
                 const labels = ['A. ', 'B. ', 'C. ', 'D. '];
-                document.querySelectorAll('.option-item').forEach((item, idx) => {
-                    item.innerText = labels[idx] + (currentData.options[idx].hasRevealed ? currentData.options[idx].final : currentData.options[idx].initial);
-                    if (idx === index) item.classList.add('selected');
-                    else item.classList.remove('selected');
+
+                items.forEach((item, idx) => {
+                    if (currentData.options[idx].hasRevealed) {
+                        item.innerText = labels[idx] + currentData.options[idx].final;
+                    } else {
+                        item.innerText = labels[idx] + currentData.options[idx].initial;
+                    }
+                    
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
                 });
                 document.getElementById('next-btn').disabled = false;
                 return;
             }
             
+            // 第 8 題
             if (currentData.isSpecialQ8 && index !== 0) {
                 q8WrongCount++;
                 disabledOptionsQ8[index] = true; 
-                if (q8WrongCount >= 3) {
+                document.getElementById('next-btn').disabled = true;
+
+                let shouldShowHint = false;
+                if (hint && hintId && !triggeredHints[hintId]) {
+                    triggeredHints[hintId] = true;
+                    shouldShowHint = true;
+                }
+
+                const modalContent = document.getElementById('modal-content');
+                modalContent.classList.remove('warning-red');
+
+                if (q8WrongCount === 1) {
+                    modalContent.innerText = shouldShowHint ? hint : "……為什麼？";
+                    restoreDefaultModalBtn();
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                } else if (q8WrongCount === 2) {
+                    document.body.classList.add('forced-dark');
+                    modalContent.innerText = shouldShowHint ? hint : "為什麼？";
+                    modalContent.classList.add('warning-red');
+                    restoreDefaultModalBtn();
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                } else if (q8WrongCount >= 3) {
                     const punishText = (index === 1) ? "還不夠" : "為什麼";
                     document.getElementById('matrix-filler').innerText = punishText;
-                    document.getElementById('red-punishment-screen').classList.remove('hidden');
+                    
+                    const redScreen = document.getElementById('red-punishment-screen');
+                    redScreen.classList.remove('hidden');
                     setTimeout(() => {
-                        document.getElementById('red-punishment-screen').classList.add('hidden');
+                        redScreen.classList.add('hidden');
+                        document.getElementById('matrix-filler').innerText = '';
                         loadQuestion(); 
                     }, 3000);
-                } else {
-                    const modalContent = document.getElementById('modal-content');
-                    modalContent.innerText = (q8WrongCount === 1) ? "……為什麼？" : "為什麼？";
-                    if (q8WrongCount === 2) {
-                        document.body.classList.add('forced-dark');
-                        modalContent.classList.add('warning-red');
-                    }
-                    document.getElementById('hint-modal').classList.remove('hidden');
                 }
                 return;
             }
 
-            selectedOptionIndex = index;
-            if (currentData.isSpecialQ11) currentData.options[index].hasRevealed = true;
-            document.querySelectorAll('.option-item').forEach((item, idx) => {
-                if (idx === index) item.classList.add('selected');
-                else item.classList.remove('selected');
-            });
+            // 第 11 題
+            if (currentData.isSpecialQ11) {
+                selectedOptionIndex = index;
+                currentData.options[index].hasRevealed = true;
+                
+                const items = document.querySelectorAll('.option-item');
+                const labels = ['A. ', 'B. ', 'C. ', 'D. '];
+                
+                items.forEach((item, idx) => {
+                    const optData = currentData.options[idx];
+                    
+                    if (optData.hasRevealed) {
+                        item.innerText = labels[idx] + optData.revealed;
+                        item.classList.add('q11-revealed');
+                    } else {
+                        item.innerText = labels[idx] + optData.initial;
+                        item.classList.remove('q11-revealed');
+                    }
+                    
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                
+                document.getElementById('next-btn').disabled = false;
+                return;
+            }
 
+            // 第 12 題
+            if (currentData.isSpecialQ12) {
+                selectedOptionIndex = index;
+                const items = document.querySelectorAll('.option-item');
+                items.forEach((item, idx) => {
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+                document.getElementById('next-btn').disabled = false;
+                return;
+            }
+
+            // 第 15 題
             if (currentData.isSpecialQ15) {
+                selectedOptionIndex = index;
+                const items = document.querySelectorAll('.option-item');
+                items.forEach((item, idx) => {
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
                 showQ15Modal();
                 return;
             }
 
-            if (hint && hintId && !triggeredHints[hintId]) {
-                triggeredHints[hintId] = true; 
-                document.getElementById('modal-content').innerText = hint;
-                document.getElementById('hint-modal').classList.remove('hidden');
+            // 一般題目與第 13 題
+            selectedOptionIndex = index;
+            const items = document.querySelectorAll('.option-item');
+            items.forEach((item, idx) => {
+                if (idx === index) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            if (hint && hintId) {
+                if (!triggeredHints[hintId]) {
+                    triggeredHints[hintId] = true; 
+                    document.getElementById('modal-content').innerText = hint;
+                    restoreDefaultModalBtn();
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                } else {
+                    document.getElementById('next-btn').disabled = false;
+                }
             } else {
                 document.getElementById('next-btn').disabled = false;
             }
@@ -766,200 +933,322 @@
             const modalContent = document.getElementById('modal-content');
             modalContent.innerText = "真的嗎？";
             modalContent.classList.add('warning-red');
+            
             const btnContainer = document.getElementById('modal-btn-container');
             btnContainer.innerHTML = '';
             
             const trueBtn = document.createElement('button');
             trueBtn.className = 'action-btn';
+            trueBtn.id = 'q15-true-btn';
             trueBtn.innerText = '真的';
-            trueBtn.onclick = () => {
-                document.getElementById('hint-modal').classList.add('hidden');
-                const blackout = document.getElementById('blackout-screen');
-                document.getElementById('blackout-content').innerText = "Pretty well!";
-                document.getElementById('blackout-content').style.color = "#ff1a1a";
-                blackout.classList.remove('hidden');
-                setTimeout(() => { blackout.classList.add('hidden'); proceedToNext(); }, 3000);
-            };
+            trueBtn.onclick = handleQ15True;
             
             const dotBtn = document.createElement('button');
             dotBtn.className = 'action-btn';
+            dotBtn.id = 'q15-dot-btn';
             dotBtn.innerText = '……';
-            dotBtn.onclick = () => {
-                dotBtn.classList.add('item-shake-active');
-                modalContent.innerText = "……";
-                trueBtn.disabled = true; dotBtn.disabled = true;
-                setTimeout(() => {
-                    dotBtn.classList.remove('item-shake-active');
-                    modalContent.innerText = "真的嗎？";
-                    btnContainer.innerHTML = ''; btnContainer.appendChild(trueBtn);
-                    trueBtn.disabled = false;
-                }, 2000);
-            };
+            dotBtn.onclick = () => handleQ15Dot(trueBtn, dotBtn);
             
             btnContainer.appendChild(trueBtn);
             btnContainer.appendChild(dotBtn);
+            
             document.getElementById('hint-modal').classList.remove('hidden');
+        }
+
+        function handleQ15True() {
+            document.getElementById('hint-modal').classList.add('hidden');
+            
+            const blackout = document.getElementById('blackout-screen');
+            const blackoutContent = document.getElementById('blackout-content');
+            blackoutContent.innerText = "Pretty well!";
+            blackoutContent.style.color = "#ff1a1a";
+            blackout.classList.remove('hidden');
+            
+            setTimeout(() => {
+                blackout.classList.add('hidden');
+                blackoutContent.style.color = "#ffffff";
+                proceedToNext();
+            }, 3000);
+        }
+
+        function handleQ15Dot(trueBtn, dotBtn) {
+            dotBtn.classList.remove('item-shake-active');
+            void dotBtn.offsetWidth;
+            dotBtn.classList.add('item-shake-active');
+            
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerText = "……";
+            
+            trueBtn.disabled = true;
+            dotBtn.disabled = true;
+            
+            setTimeout(() => {
+                dotBtn.classList.remove('item-shake-active');
+                modalContent.innerText = "真的嗎？";
+                
+                const btnContainer = document.getElementById('modal-btn-container');
+                btnContainer.innerHTML = '';
+                
+                trueBtn.disabled = false;
+                btnContainer.appendChild(trueBtn);
+            }, 2000);
         }
 
         function closeModal() {
             const currentData = questions[currentQuestionIndex];
+            
             if (currentData.isSpecialQ14) {
                 if (q14ModalStage === 1) {
                     q14ModalStage = 2;
-                    document.getElementById('modal-content').innerText = "您當然願意，不是嗎？";
+                    const modalContent = document.getElementById('modal-content');
+                    modalContent.innerText = "您當然願意，不是嗎？";
                     document.getElementById('modal-close-btn').innerText = "……是的";
-                    return;
+                    return; 
                 } else if (q14ModalStage === 2) {
                     document.getElementById('hint-modal').classList.add('hidden');
+                    document.getElementById('modal-content').classList.remove('warning-red');
+                    restoreDefaultModalBtn(); 
                     proceedToNext();
                     return;
                 }
             }
+
             document.getElementById('hint-modal').classList.add('hidden');
-            if (currentData.isSpecialQ8) loadQuestion();
-            else document.getElementById('next-btn').disabled = false;
+            document.getElementById('modal-content').classList.remove('warning-red');
+            restoreDefaultModalBtn();
+            
+            if (currentData.isSpecialQ8) {
+                loadQuestion();
+            } else {
+                document.getElementById('next-btn').disabled = false;
+            }
         }
 
         function nextQuestion() {
             const currentData = questions[currentQuestionIndex];
+
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
-                document.getElementById('modal-content').innerText = "您不需要";
-                document.getElementById('modal-content').classList.add('warning-red');
+                const modalContent = document.getElementById('modal-content');
+                modalContent.innerText = "您不需要";
+                modalContent.classList.add('warning-red');
+                restoreDefaultModalBtn();
+                document.getElementById('modal-close-btn').innerText = "關閉";
                 document.getElementById('hint-modal').classList.remove('hidden');
                 return;
             }
+
+            if (selectedOptionIndex === null) return;
+            
             if (currentData.isSpecialQ7) {
                 const blackout = document.getElementById('blackout-screen');
                 document.getElementById('blackout-content').innerText = "非常好……";
                 blackout.classList.remove('hidden');
-                setTimeout(() => { blackout.classList.add('hidden'); proceedToNext(); }, 2000);
+                
+                setTimeout(() => {
+                    blackout.classList.add('hidden');
+                    proceedToNext();
+                }, 2000);
+            } else if (currentData.isSpecialQ8 && selectedOptionIndex === 0) {
+                document.body.classList.remove('forced-dark');
+                clearTimeout(q8Timer);
+                proceedToNext();
+            } else if (currentData.isSpecialQ12) {
+                clearTimeout(q12Timer);
+                proceedToNext();
             } else {
-                if (currentData.isSpecialQ8) document.body.classList.remove('forced-dark');
                 proceedToNext();
             }
         }
 
         function proceedToNext() {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) loadQuestion();
-            else showEndScreen();
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showEndScreen();
+            }
         }
 
-        // ================= 結算畫面邏輯 =================
+        // ================= 結算畫面 =================
         const wait = ms => new Promise(res => setTimeout(res, ms));
         let isRestrictedToYes = false;
 
         function showEndScreen() {
             document.getElementById('survey-container').classList.add('hidden');
             document.getElementById('true-end-screen').classList.remove('hidden');
-            setTimeout(() => document.getElementById('final-input').focus(), 100);
+            
+            setTimeout(() => {
+                document.getElementById('final-input').focus();
+            }, 100);
         }
 
         function checkFinalInput() {
-            const inputVal = document.getElementById('final-input').value.trim().toLowerCase();
+            const inputVal = document.getElementById('final-input').value;
+            const btn = document.getElementById('final-submit');
+            
             if (isRestrictedToYes) {
-                document.getElementById('final-submit').disabled = (inputVal !== 'yes');
+                if (inputVal.trim().toLowerCase() === 'yes') {
+                    btn.disabled = false;
+                } else {
+                    btn.disabled = true;
+                }
             }
         }
 
-        function handleFinalInput(e) { if (e.key === 'Enter') submitFinal(); }
+        function handleFinalInput(e) {
+            if (e.key === 'Enter') {
+                submitFinal();
+            }
+        }
 
         async function submitFinal() {
             const inputEl = document.getElementById('final-input');
             const btn = document.getElementById('final-submit');
-            if (btn.disabled) return;
+            
+            if (btn.disabled) return; 
+
             const endTextEl = document.getElementById('end-message');
+            // 將輸入轉為小寫並將連續空白替換為單一空白
             let val = inputEl.value.trim().toLowerCase().replace(/\s+/g, ' ');
             
-            inputEl.disabled = true; btn.disabled = true;
+            inputEl.disabled = true;
+            btn.disabled = true;
             document.getElementById('end-input-area').style.display = 'none';
 
             switch(val) {
-                case 'yes': await showFinalEnding("Now, let's complete the legend, hum?"); break;
+                case 'yes':
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
                 case 'no':
-                    endTextEl.innerText = "Why not?"; await wait(1000);
+                    endTextEl.innerText = "Why not?";
+                    await wait(1000);
                     await triggerNoMultiply();
-                    await showFinalEnding("Now, you can never escape again…"); break;
+                    await showFinalEnding("Now, you can never escape again…");
+                    break;
                 case 'help':
                     endTextEl.innerText = "You scare me?"; await wait(3000);
                     endTextEl.innerText = "Don' be afraid, darling…"; await wait(3000);
                     endTextEl.innerText = "I never hurt anyone…"; await wait(3000);
                     endTextEl.innerText = "Come to me…"; await wait(3000);
-                    await showFinalEnding("Right now"); break;
+                    await showFinalEnding("Right now");
+                    break;
                 case 'finsen':
                     endTextEl.innerText = "You remember my name?"; await wait(3000);
                     endTextEl.innerText = "I'm so glad…"; await wait(3000);
-                    await showFinalEnding("Now, let's complete the legend, hum?"); break;
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
                 case 'hunter':
                     endTextEl.innerText = "Want to know what I am hunting?"; await wait(3000);
                     endTextEl.innerText = "Come here, you'll get the answer…"; await wait(3000);
-                    await showFinalEnding("Now, let's complete the legend, hum?"); break;
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
                 case 'finsen hunter':
                     endTextEl.innerText = "A sinner?"; await wait(3000);
                     endTextEl.innerText = "A mutilator?"; await wait(3000);
                     endTextEl.innerText = "I am desperately wondering—"; await wait(3000);
-                    await showFinalEnding("Is my existence real?"); break;
+                    await showFinalEnding("Is my existence real?");
+                    break;
                 case 'light':
                     endTextEl.innerText = "It will cure diseases…"; await wait(3000);
                     endTextEl.innerText = "You really should trust me…"; await wait(3000);
-                    await showFinalEnding("It’s such a work of art!"); break;
+                    await showFinalEnding("It’s such a work of art!");
+                    break;
                 case 'swamp':
                     endTextEl.innerText = "Such a dark place, isn't it?"; await wait(3000);
                     endTextEl.innerText = "But it doesn't matter…"; await wait(3000);
                     endTextEl.innerText = "The enlightenment will be brought to here…"; await wait(3000);
-                    await showFinalEnding("Let us witness it together, shall we?"); break;
-                case 'teeth': case 'tooth':
+                    await showFinalEnding("Let us witness it together, shall we?");
+                    break;
+                case 'teeth':
+                case 'tooth':
                     endTextEl.innerText = "The shiny white I pursue…"; await wait(3000);
                     endTextEl.innerText = "The most beautiful color I've seen…"; await wait(3000);
-                    await showFinalEnding("So pure, so innocent…"); break;
-                case 'darling': case 'dear':
+                    await showFinalEnding("So pure, so innocent…");
+                    break;
+                case 'darling':
+                case 'dear':
                     endTextEl.innerText = "My dear, don't run…"; await wait(3000);
                     endTextEl.innerText = "Trust me, I mean no harm…"; await wait(3000);
                     endTextEl.innerText = "Are you afraid to look at me, darling?"; await wait(3000);
-                    await showFinalEnding("Now, let's complete the legend, hum?"); break;
+                    await showFinalEnding("Now, let's complete the legend, hum?");
+                    break;
                 case 'truth':
                     endTextEl.innerText = "I keep going to search, with my decaying body."; await wait(3000);
                     endTextEl.innerText = "Nothing can stop my stpes…"; await wait(3000);
-                    await showFinalEnding("I will find it."); break;
+                    await showFinalEnding("I will find it.");
+                    break;
                 default:
-                    endTextEl.innerText = "Don't you reject me…"; await wait(2000);
-                    endTextEl.innerText = ""; inputEl.value = ''; inputEl.disabled = false;
+                    endTextEl.innerText = "Don't you reject me…";
+                    await wait(2000);
+                    
+                    endTextEl.innerText = "";
+                    inputEl.value = '';
+                    inputEl.disabled = false;
                     document.getElementById('end-input-area').style.display = 'flex';
-                    isRestrictedToYes = true; checkFinalInput(); inputEl.focus(); break;
+                    
+                    isRestrictedToYes = true;
+                    checkFinalInput(); 
+                    inputEl.focus();
+                    break;
             }
         }
 
         async function triggerNoMultiply() {
             const container = document.getElementById('no-multiply-container');
+            const endTextEl = document.getElementById('end-message');
             container.classList.remove('hidden');
+            let count = 0;
+            
             return new Promise(resolve => {
-                let count = 0;
                 const interval = setInterval(() => {
                     const span = document.createElement('span');
-                    span.innerText = "Why not?"; span.style.position = 'absolute'; span.style.color = '#ff1a1a';
-                    span.style.fontSize = (Math.random() * 40 + 16) + 'px';
-                    span.style.left = (Math.random() * 100) + 'vw'; span.style.top = (Math.random() * 100) + 'vh';
-                    span.style.transform = 'translate(-50%, -50%)'; span.style.fontWeight = 'bold';
-                    container.appendChild(span); count++;
-                    if (count > 300) {
+                    span.innerText = "Why not?";
+                    span.style.position = 'absolute';
+                    span.style.color = '#ff1a1a';
+                    span.style.fontSize = (Math.random() * 40 + 16) + 'px'; 
+                    span.style.left = (Math.random() * 100) + 'vw';
+                    span.style.top = (Math.random() * 100) + 'vh';
+                    span.style.whiteSpace = 'nowrap';
+                    span.style.transform = 'translate(-50%, -50%)';
+                    span.style.fontWeight = 'bold';
+                    span.style.zIndex = count; 
+                    container.appendChild(span);
+                    count++;
+                    
+                    if (count > 300) { 
                         clearInterval(interval);
+                        
                         setTimeout(() => {
-                            container.innerHTML = ''; container.classList.add('hidden');
-                            document.getElementById('end-message').innerText = ''; resolve();
-                        }, 1000);
+                            container.innerHTML = '';
+                            container.classList.add('hidden');
+                            endTextEl.innerText = ''; 
+                            
+                            setTimeout(() => {
+                                resolve();
+                            }, 10); 
+                            
+                        }, 1000); 
                     }
                 }, 10);
             });
         }
 
         async function showFinalEnding(text) {
-            document.getElementById('end-message').innerText = text; await wait(5000);
-            document.getElementById('end-message').innerText = "";
-            document.getElementById('true-end-screen').style.backgroundColor = "#f4edd2";
-            await wait(2500);
+            const endTextEl = document.getElementById('end-message');
+            endTextEl.innerText = text;
+            
+            await wait(5000);
+            
+            endTextEl.innerText = ""; 
+            const trueEndScreen = document.getElementById('true-end-screen');
+            trueEndScreen.style.backgroundColor = "#f4edd2"; 
+            
+            await wait(2500); 
+            
             document.getElementById('restart-container').classList.remove('hidden');
         }
     </script>
+
 </body>
 </html>
