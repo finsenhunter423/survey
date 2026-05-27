@@ -500,7 +500,7 @@
         </div>
 
         <div id="restart-container" class="hidden">
-            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">重新翻閱</button>
+            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 22px; padding: 6px 25px; line-height: 1;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">⟳</button>
         </div>
     </div>
 
@@ -1089,7 +1089,6 @@
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
                 case 'no':
-                    // 【新增效果】觸發後立刻停止背景音樂
                     const bgMusic = document.getElementById('bg-music');
                     if (bgMusic) {
                         bgMusic.pause();
