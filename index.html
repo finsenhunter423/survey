@@ -556,10 +556,10 @@
                 question: "7. 您是否相信「光療法」？",
                 isSpecialQ7: true,
                 options: [
-                    { initial: "深信不疑", final: "深信不疑" }, 
-                    { initial: "相信", final: "深信不疑" }, 
-                    { initial: "不相信", final: "深信不疑" }, 
-                    { initial: "光療法是什麼？", final: "深信不疑" }
+                    { initial: "深信不疑", final: "深信不疑", hasRevealed: false }, 
+                    { initial: "相信", final: "深信不疑", hasRevealed: false }, 
+                    { initial: "不相信", final: "深信不疑", hasRevealed: false }, 
+                    { initial: "光療法是什麼？", final: "深信不疑", hasRevealed: false }
                 ]
             },
             {
@@ -680,7 +680,11 @@
                     btn.className = 'option-item';
                     btn.id = `q7-opt-${index}`;
                     
-                    btn.innerText = labels[index] + opt.initial;
+                    if (opt.hasRevealed) {
+                        btn.innerText = labels[index] + opt.final;
+                    } else {
+                        btn.innerText = labels[index] + opt.initial;
+                    }
                     
                     btn.onclick = () => selectOption(index);
                     container.appendChild(btn);
@@ -790,15 +794,21 @@
             // 第 7 題
             if (currentData.isSpecialQ7) {
                 selectedOptionIndex = index;
+                currentData.options[index].hasRevealed = true;
+                
                 const items = document.querySelectorAll('.option-item');
                 const labels = ['A. ', 'B. ', 'C. ', 'D. '];
 
                 items.forEach((item, idx) => {
-                    if (idx === index) {
+                    if (currentData.options[idx].hasRevealed) {
                         item.innerText = labels[idx] + currentData.options[idx].final;
-                        item.classList.add('selected');
                     } else {
                         item.innerText = labels[idx] + currentData.options[idx].initial;
+                    }
+                    
+                    if (idx === index) {
+                        item.classList.add('selected');
+                    } else {
                         item.classList.remove('selected');
                     }
                 });
@@ -962,7 +972,7 @@
             
             const blackout = document.getElementById('blackout-screen');
             const blackoutContent = document.getElementById('blackout-content');
-            blackoutContent.innerText = "Pretty well, my dear";
+            blackoutContent.innerText = "Pretty well!";
             blackoutContent.style.color = "#ff1a1a";
             blackout.classList.remove('hidden');
             
@@ -1003,7 +1013,7 @@
                 if (q14ModalStage === 1) {
                     q14ModalStage = 2;
                     const modalContent = document.getElementById('modal-content');
-                    modalContent.innerText = "當然願意，不是嗎？";
+                    modalContent.innerText = "您當然願意，不是嗎？";
                     document.getElementById('modal-close-btn').innerText = "……是的";
                     return; 
                 } else if (q14ModalStage === 2) {
@@ -1032,7 +1042,7 @@
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
                 const modalContent = document.getElementById('modal-content');
-                modalContent.innerText = "不需要";
+                modalContent.innerText = "您不需要";
                 modalContent.classList.add('warning-red');
                 restoreDefaultModalBtn();
                 document.getElementById('modal-close-btn').innerText = "關閉";
@@ -1148,7 +1158,8 @@
                 case 'finsen hunter':
                     endTextEl.innerText = "A sinner?"; await wait(3000);
                     endTextEl.innerText = "A Mutilator?"; await wait(3000);
-                    await showFinalEnding("Or the Asclepius, who vanished in the swamp…");
+                    endTextEl.innerText = "I am desperately wondering—"; await wait(3000);
+                    await showFinalEnding("Is my existence real?");
                     break;
                 case 'light':
                     endTextEl.innerText = "It will cure diseases…"; await wait(3000);
