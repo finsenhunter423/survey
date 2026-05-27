@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口腔健康與習慣調查</title>
+    <title>一份調查報告，似乎是未設計完成的問卷，</title>
     <style>
         /* 19世紀簡約古典風格 */
         body {
@@ -52,18 +52,11 @@
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: normal;
             letter-spacing: 2px;
-            margin: 0 0 10px 0;
-        }
-
-        .author {
-            font-size: 14px;
-            font-style: italic;
-            color: #5c5146;
-            margin: 0 0 25px 0;
-            letter-spacing: 1px;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
         }
 
         .introduction {
@@ -452,8 +445,7 @@
         
         <div id="welcome-screen">
             <div class="header-section">
-                <h1>口腔健康與習慣調查</h1>
-                <div class="author">芬森·亨特</div>
+                <h1>一份調查報告，似乎是未設計完成的問卷，</h1>
                 <p class="introduction">
                     本問卷旨在調查口腔健康與衛生習慣，請依據您的習慣作答。
                 </p>
@@ -461,7 +453,7 @@
 
             <div class="content-section">
                 <div class="btn-container">
-                    <button class="action-btn" onclick="startSurvey()">開始作答</button>
+                    <button class="action-btn" onclick="startSurvey()">翻閱</button>
                 </div>
             </div>
         </div>
@@ -512,7 +504,7 @@
         </div>
 
         <div id="restart-container" class="hidden">
-            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">重新填寫</button>
+            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">重新翻閱</button>
         </div>
     </div>
 
@@ -1157,7 +1149,7 @@
                     break;
                 case 'finsen hunter':
                     endTextEl.innerText = "A sinner?"; await wait(3000);
-                    endTextEl.innerText = "A Mutilator?"; await wait(3000);
+                    endTextEl.innerText = "A mutilator?"; await wait(3000);
                     endTextEl.innerText = "I am desperately wondering—"; await wait(3000);
                     await showFinalEnding("Is my existence real?");
                     break;
