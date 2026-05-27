@@ -765,9 +765,12 @@
                     
                     if (idx === index) {
                         item.classList.add('selected');
-                        item.classList.remove('item-shake-active');
-                        void item.offsetWidth;
-                        item.classList.add('item-shake-active');
+                        // 僅當選擇的不是第一個選項 (A選項) 時才觸發震動
+                        if (index !== 0) {
+                            item.classList.remove('item-shake-active');
+                            void item.offsetWidth;
+                            item.classList.add('item-shake-active');
+                        }
                     } else {
                         item.classList.remove('selected');
                     }
