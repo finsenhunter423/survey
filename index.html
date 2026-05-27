@@ -504,6 +504,10 @@
         </div>
     </div>
 
+    <audio id="bg-music" loop>
+        <source src="The Dentist's Theme.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const questions = [
             {
@@ -622,6 +626,15 @@
         const triggeredHints = {};
 
         function startSurvey() {
+            // 播放背景音樂
+            const music = document.getElementById('bg-music');
+            if(music) {
+                music.volume = 0.5; // 可調整音量
+                music.play().catch(error => {
+                    console.log("瀏覽器阻擋了自動播放，需要使用者互動後才可啟動");
+                });
+            }
+
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('question-screen').classList.remove('hidden');
             loadQuestion();
@@ -1085,9 +1098,9 @@
                     await showFinalEnding("Now, you can never escape again…");
                     break;
                 case 'help':
-                    endTextEl.innerText = "You scare me?"; await wait(3000);
+                    endTextEl.innerText = "You scare of me?"; await wait(3000);
                     endTextEl.innerText = "Don' be afraid, darling…"; await wait(3000);
-                    endTextEl.innerText = "I never hurt anyone…"; await wait(3000);
+                    endTextEl.innerText = "I'll never hurt anyone…"; await wait(3000);
                     endTextEl.innerText = "Come to me…"; await wait(3000);
                     await showFinalEnding("Right now");
                     break;
@@ -1133,12 +1146,12 @@
                     break;
                 case 'truth':
                     endTextEl.innerText = "I keep going to search, with my decaying body."; await wait(3000);
-                    endTextEl.innerText = "Nothing can stop my stpes…"; await wait(3000);
+                    endTextEl.innerText = "Nothing can stop my steps…"; await wait(3000);
                     await showFinalEnding("I will find it.");
                     break;
                 default:
                     endTextEl.innerText = "Don't you reject me…";
-                    await wait(2000);
+                    await wait(3000);
                     
                     endTextEl.innerText = "";
                     inputEl.value = '';
