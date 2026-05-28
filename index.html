@@ -421,7 +421,10 @@
             color: #ffffff !important;
         }
         body.deep-dark-mode .modal-text.warning-red {
-            color: #ff1a1a !important;
+            /* 調整為較亮的紅色，並加上微弱發光，避免在純黑背景下產生光學邊緣模糊的狀況 */
+            color: #ff5555 !important;
+            font-weight: bold;
+            text-shadow: 0 0 1px rgba(255, 85, 85, 0.4);
         }
         body.deep-dark-mode .modal-box button.action-btn {
             background-color: #000000 !important;
@@ -537,6 +540,17 @@
             pointer-events: none;
             z-index: 10;
         }
+
+        /* 確保重新開始按鈕在最後亮色背景下顯示為黑框黑字，不被黑夜模式覆蓋 */
+        #restart-container button.action-btn {
+            color: #2b251f !important;
+            border-color: #2b251f !important;
+            background-color: transparent !important;
+        }
+        #restart-container button.action-btn:hover:not(:disabled) {
+            background-color: #2b251f !important;
+            color: #fbf8eb !important;
+        }
     </style>
 </head>
 <body>
@@ -570,7 +584,6 @@
 
     </div>
 
-    <!-- 彈出視窗 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -584,17 +597,14 @@
         <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
-    <!-- 閒置超時專用黑畫面 -->
     <div id="idle-blackout-screen" class="blackout-overlay hidden" style="z-index: 4500;">
         <div class="blackout-text" style="color: #ff1a1a; font-style: italic; font-size: 32px; font-weight: bold;">您在猶豫什麼呢？</div>
     </div>
 
-    <!-- 處罰畫面 -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler"></div>
     </div>
 
-    <!-- 結算畫面 -->
     <div id="true-end-screen" class="hidden">
         <div id="no-multiply-container" class="hidden"></div>
         
@@ -606,18 +616,15 @@
             </div>
         </div>
 
-        <!-- 重新開始按鈕 -->
         <div id="restart-container" class="hidden">
-            <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">Retry</button>
+            <button class="action-btn" style="font-size: 16px; padding: 12px 35px;" onclick="window.location.reload()">Retry</button>
         </div>
     </div>
 
-    <!-- 背景音樂播放器 -->
     <audio id="bg-music" loop>
         <source src="The Dentist's Theme.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- 彩蛋專用音效播放器 -->
     <audio id="se-no">
         <source src="Ultraviolet Radiation.mp3" type="audio/mpeg">
     </audio>
@@ -1194,7 +1201,7 @@
                 if (q14ModalStage === 1) {
                     q14ModalStage = 2;
                     const modalContent = document.getElementById('modal-content');
-                    modalContent.innerText = "您當然願意，不是嗎？";
+                    modalContent.innerText = "理所當然需要接受治療，不是嗎？";
                     document.getElementById('modal-close-btn').innerText = "……是的";
                     return; 
                 } else if (q14ModalStage === 2) {
@@ -1223,7 +1230,7 @@
             if (currentData.isSpecialQ14) {
                 q14ModalStage = 1;
                 const modalContent = document.getElementById('modal-content');
-                modalContent.innerText = "您不需要";
+                modalContent.innerText = "沒有拒絕的餘地";
                 modalContent.classList.add('warning-red');
                 restoreDefaultModalBtn();
                 document.getElementById('modal-close-btn').innerText = "關閉";
