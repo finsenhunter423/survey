@@ -85,6 +85,7 @@
             color: #7a6f62;
             margin-bottom: 15px;
             letter-spacing: 1px;
+            transition: color 0.5s ease;
         }
 
         .question-text {
@@ -93,6 +94,7 @@
             margin-bottom: 25px;
             text-align: center;
             font-weight: normal;
+            transition: color 0.5s ease;
         }
 
         /* 讓特定題目文字變紅的樣式 */
@@ -277,6 +279,24 @@
             animation: glitch-flicker 0.25s ease-in-out;
         }
 
+        /* 全螢幕顫抖特效 */
+        @keyframes screen-shake-anim {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-10px, -10px); }
+            20% { transform: translate(10px, 10px); }
+            30% { transform: translate(-10px, 10px); }
+            40% { transform: translate(10px, -10px); }
+            50% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            70% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            90% { transform: translate(-2px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+        .screen-shake {
+            animation: screen-shake-anim 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
         /* 高頻率選項抖動 */
         @keyframes item-shake {
             0% { transform: translateX(0); }
@@ -306,6 +326,12 @@
             border-color: #2b251f !important;
         }
 
+        /* 第 13 題初始白字特效 */
+        .option-item.q-white-text {
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+
         /* 第 13、15 題紅字選項 */
         .option-item.q-red {
             color: #ff1a1a !important;
@@ -317,7 +343,7 @@
             border-color: #2b251f !important;
         }
 
-        /* 網頁整體被迫黑化 */
+        /* 網頁整體被迫黑化 (第8題失敗等) */
         body.forced-dark {
             background-color: #0a0a0a !important;
             color: #8a8275 !important;
@@ -347,6 +373,79 @@
         body.forced-dark button.action-btn:hover:not(:disabled) {
             background-color: #8a8275 !important;
             color: #121212 !important;
+        }
+
+        /* 第13~15題專用深黑背景模式 */
+        body.deep-dark-mode {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+        body.deep-dark-mode #survey-container {
+            background-color: #050505 !important;
+            border-color: #333333 !important;
+        }
+        body.deep-dark-mode #survey-container::before {
+            border-color: #222222 !important;
+        }
+        body.deep-dark-mode .question-text {
+            color: #ffffff; 
+        }
+        body.deep-dark-mode .question-text.warning-red {
+            color: #ff1a1a !important; 
+        }
+        body.deep-dark-mode .progress-indicator {
+            color: #555555 !important;
+        }
+        body.deep-dark-mode button.action-btn {
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+        body.deep-dark-mode button.action-btn:hover:not(:disabled) {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        body.deep-dark-mode button.action-btn:disabled {
+            border-color: #555555 !important;
+            color: #555555 !important;
+        }
+        
+        /* 第14~15題深黑模式下專用提示框樣式 */
+        body.deep-dark-mode .modal-box {
+            background-color: #000000 !important;
+            border-color: #ffffff !important;
+        }
+        body.deep-dark-mode .modal-box::before {
+            border-color: #333333 !important;
+        }
+        body.deep-dark-mode .modal-text {
+            color: #ffffff !important;
+        }
+        body.deep-dark-mode .modal-text.warning-red {
+            color: #ff1a1a !important;
+        }
+        body.deep-dark-mode .modal-box button.action-btn {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid #ffffff !important;
+        }
+        body.deep-dark-mode .modal-box button.action-btn:hover:not(:disabled) {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        /* 確保紅字選項在深黑模式下依然保持紅色並正常反白 */
+        body.deep-dark-mode .option-item.q-red {
+            background-color: transparent !important;
+            color: #ff1a1a !important;
+            border-color: #ff1a1a !important;
+        }
+        body.deep-dark-mode .option-item.q-red:hover:not(:disabled) {
+            background-color: #1a0000 !important;
+        }
+        body.deep-dark-mode .option-item.selected.q-red {
+            background-color: #ff1a1a !important;
+            color: #000000 !important;
+            border-color: #ff1a1a !important;
         }
 
         .hidden {
@@ -471,6 +570,7 @@
 
     </div>
 
+    <!-- 彈出視窗 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -484,10 +584,17 @@
         <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
+    <!-- 閒置超時專用黑畫面 -->
+    <div id="idle-blackout-screen" class="blackout-overlay hidden" style="z-index: 4500;">
+        <div class="blackout-text" style="color: #ff1a1a; font-style: italic; font-size: 32px; font-weight: bold;">您在猶豫什麼呢？</div>
+    </div>
+
+    <!-- 處罰畫面 -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler"></div>
     </div>
 
+    <!-- 結算畫面 -->
     <div id="true-end-screen" class="hidden">
         <div id="no-multiply-container" class="hidden"></div>
         
@@ -499,35 +606,100 @@
             </div>
         </div>
 
+        <!-- 重新開始按鈕 -->
         <div id="restart-container" class="hidden">
             <button class="action-btn" style="border-color: #2b251f; color: #2b251f; font-size: 16px; padding: 12px 35px;" onmouseover="this.style.backgroundColor='#2b251f'; this.style.color='#fbf8eb';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2b251f';" onclick="window.location.reload()">Retry</button>
         </div>
     </div>
 
+    <!-- 背景音樂播放器 -->
     <audio id="bg-music" loop>
         <source src="The Dentist's Theme.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- 彩蛋專用音效播放器 -->
     <audio id="se-no">
         <source src="Ultraviolet Radiation.mp3" type="audio/mpeg">
     </audio>
 
     <script>
+        // 閒置時間計時器
+        let idleTime = 0;
+        
+        setInterval(() => {
+            idleTime++;
+            const targetQuestions = [6, 7, 10, 11, 12, 13, 14]; // 第 7, 8, 11, 12, 13, 14, 15 題
+            
+            let isQuestionScreen = !document.getElementById('question-screen').classList.contains('hidden');
+            let isEndScreen = !document.getElementById('true-end-screen').classList.contains('hidden');
+            
+            // 題目畫面的超時黑屏
+            if (isQuestionScreen && targetQuestions.includes(currentQuestionIndex)) {
+                let isModalActive = !document.getElementById('hint-modal').classList.contains('hidden');
+                let isPunishActive = !document.getElementById('red-punishment-screen').classList.contains('hidden');
+                let isBlackoutActive = !document.getElementById('blackout-screen').classList.contains('hidden');
+                let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
+                
+                if (idleTime >= 15 && !isModalActive && !isPunishActive && !isBlackoutActive && !isIdleBlackoutActive) {
+                    const idleScreen = document.getElementById('idle-blackout-screen');
+                    idleScreen.classList.remove('hidden');
+                    
+                    // 持續3秒後消失
+                    setTimeout(() => {
+                        idleScreen.classList.add('hidden');
+                        idleTime = 0; 
+                    }, 3000);
+                    
+                    idleTime = 0; 
+                }
+            }
+            
+            // 結算畫面的超時黑屏
+            if (isEndScreen && !document.getElementById('final-input').disabled) {
+                let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
+                
+                if (idleTime >= 20 && !isIdleBlackoutActive) {
+                    const idleScreen = document.getElementById('idle-blackout-screen');
+                    const idleText = idleScreen.querySelector('.blackout-text');
+                    
+                    idleText.innerText = "I'm still waiting your answer.";
+                    idleScreen.classList.remove('hidden');
+                    
+                    // 持續3秒後返回輸入畫面
+                    setTimeout(() => {
+                        idleScreen.classList.add('hidden');
+                        idleText.innerText = "您在猶豫什麼呢？"; // 復原為預設文字
+                        idleTime = 0;
+                    }, 3000);
+                    
+                    idleTime = 0;
+                }
+            }
+        }, 1000);
+
+        function resetIdleTime() {
+            idleTime = 0;
+        }
+
+        document.addEventListener('click', resetIdleTime);
+        document.addEventListener('keydown', resetIdleTime);
+        document.addEventListener('touchstart', resetIdleTime);
+
         const questions = [
             {
-                question: "1. 您刷牙的頻率如何？",
+                question: "1. 刷牙的頻率如何？",
                 options: [{ text: "餐後刷牙" }, { text: "早/晚刷牙" }, { text: "想到才刷牙" }, { text: "幾乎不刷牙" }]
             },
             {
-                question: "2. 您刷牙時是否使用牙粉(Tooth Powder)？",
+                question: "2. 刷牙時是否使用牙粉(Tooth Powder)？",
                 options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }]
             },
             {
-                question: "3. 您是否使用漱口水？",
+                question: "3. 是否使用漱口水？",
                 options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }]
             },
             {
-                question: "4. 您是否曾罹患齲齒？",
+                question: "4. 是否曾罹患齲齒？",
                 options: [
                     { text: "從未" },
                     { text: "曾罹患，已治療" },
@@ -536,7 +708,7 @@
                 ]
             },
             {
-                question: "5. 您是否固定至牙科看診？",
+                question: "5. 是否固定至牙科看診？",
                 options: [
                     { text: "每半年一次或更多", hint: "乖孩子……", hintId: "q5_a" },
                     { text: "每年一次或更少", hint: "還能再進步呢……", hintId: "q5_b" },
@@ -545,11 +717,11 @@
                 ]
             },
             {
-                question: "6. 您是否知道什麼是「根管治療」？",
+                question: "6. 是否知道什麼是「根管治療」？",
                 options: [{ text: "十分了解" }, { text: "大概知道" }, { text: "不太清楚" }, { text: "從未聽說" }]
             },
             {
-                question: "7. 您是否相信「光療法」？",
+                question: "7. 是否相信「光療法」？",
                 isSpecialQ7: true,
                 options: [
                     { initial: "深信不疑", final: "深信不疑", hasRevealed: false }, 
@@ -559,7 +731,7 @@
                 ]
             },
             {
-                question: "8. 您是否相信我……？",
+                question: "8. 是否相信我……？",
                 isSpecialQ8: true,
                 options: [
                     { initial: "……什麼？", final: "當然" },
@@ -569,15 +741,15 @@
                 ]
             },
             {
-                question: "9. 您食用甜點或含糖飲料的頻率如何？",
+                question: "9. 食用甜點或含糖飲料的頻率如何？",
                 options: [{ text: "每天" }, { text: "經常" }, { text: "很少" }, { text: "幾乎沒有" }]
             },
             {
-                question: "10. 您是否接受過牙齒矯正？",
+                question: "10. 是否接受過牙齒矯正？",
                 options: [{ text: "正在進行" }, { text: "曾經有" }, { text: "未來計畫進行" }, { text: "不曾且無計畫接受" }]
             },
             { 
-                question: "11. 您聽說過關於沼澤的「故事」嗎？", 
+                question: "11. 聽說過關於沼澤的「故事」嗎？", 
                 isSpecialQ11: true,
                 options: [
                     { initial: "……沒有", revealed: "Long long ago, a tale was born", hasRevealed: false },
@@ -587,7 +759,7 @@
                 ] 
             },
             { 
-                question: "12. 您是否願意進入「診療室」", 
+                question: "12. 是否願意進入「診療室」", 
                 isSpecialQ12: true,
                 options: [
                     { initial: "願意", final: "願意", hasRevealed: false }, 
@@ -597,7 +769,7 @@
                 ] 
             },
             { 
-                question: "13. 您願意接受口腔檢查嗎？", 
+                question: "13. 願意接受口腔檢查嗎？", 
                 isSpecialQ13: true,
                 options: [
                     { text: "願意" }, { text: "願意" }, { text: "願意" }, { text: "願意" }
@@ -612,7 +784,10 @@
                 question: "15. 請不要逃跑，好嗎？", 
                 isSpecialQ15: true,
                 options: [
-                    { text: "我不會逃跑" }, { text: "我不會逃跑" }, { text: "我不會逃跑" }, { text: "我不會逃跑" }
+                    { initial: "快逃！", final: "我不會逃跑" }, 
+                    { initial: "快逃！", final: "我不會逃跑" }, 
+                    { initial: "快逃！", final: "我不會逃跑" }, 
+                    { initial: "快逃！", final: "我不會逃跑" }
                 ] 
             }
         ];
@@ -630,6 +805,8 @@
         const triggeredHints = {};
 
         function startSurvey() {
+            resetIdleTime(); 
+            
             const music = document.getElementById('bg-music');
             if(music) {
                 music.volume = 0.25; 
@@ -649,6 +826,7 @@
         }
 
         function loadQuestion() {
+            resetIdleTime(); 
             selectedOptionIndex = null;
             
             const nextBtn = document.getElementById('next-btn');
@@ -657,6 +835,12 @@
             
             const currentData = questions[currentQuestionIndex];
             const questionTextEl = document.getElementById('question-text');
+            
+            if (currentQuestionIndex >= 12 && currentQuestionIndex <= 14) {
+                document.body.classList.add('deep-dark-mode');
+            } else {
+                document.body.classList.remove('deep-dark-mode');
+            }
             
             document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / 15`;
             questionTextEl.innerText = currentData.question;
@@ -673,7 +857,7 @@
             const labels = ['A. ', 'B. ', 'C. ', 'D. '];
             
             if (currentData.isSpecialQ14) {
-                nextBtn.innerText = '……選項呢？';
+                nextBtn.innerText = '選項呢';
                 nextBtn.disabled = false;
             } else if (currentData.isSpecialQ7 || currentData.isSpecialQ12) {
                 const prefix = currentData.isSpecialQ7 ? 'q7' : 'q12';
@@ -739,15 +923,54 @@
                     }
                     container.appendChild(btn);
                 });
-            } else if (currentData.isSpecialQ13 || currentData.isSpecialQ15) {
+            } else if (currentData.isSpecialQ13) {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
-                    btn.className = 'option-item q-red';
-                    btn.id = `opt-${index}`;
+                    btn.className = 'option-item q-white-text';
+                    btn.id = `q13-opt-${index}`;
                     btn.innerText = labels[index] + opt.text;
                     btn.onclick = () => selectOption(index);
                     container.appendChild(btn);
                 });
+
+                setTimeout(() => {
+                    currentData.options.forEach((opt, index) => {
+                        const btn = document.getElementById(`q13-opt-${index}`);
+                        if (btn) {
+                            btn.classList.add('glitch-active');
+                            setTimeout(() => {
+                                btn.classList.remove('q-white-text');
+                                btn.classList.add('q-red');
+                                btn.classList.remove('glitch-active');
+                            }, 250);
+                        }
+                    });
+                }, 800);
+
+            } else if (currentData.isSpecialQ15) {
+                currentData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-item q-red';
+                    btn.id = `q15-opt-${index}`;
+                    btn.innerText = labels[index] + opt.initial;
+                    btn.onclick = () => selectOption(index);
+                    container.appendChild(btn);
+                });
+
+                setTimeout(() => {
+                    document.body.classList.add('screen-shake');
+                    currentData.options.forEach((opt, index) => {
+                        const btn = document.getElementById(`q15-opt-${index}`);
+                        if (btn) {
+                            btn.innerText = labels[index] + opt.final;
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        document.body.classList.remove('screen-shake');
+                    }, 500);
+                }, 1000); 
+
             } else {
                 currentData.options.forEach((opt, index) => {
                     const btn = document.createElement('button');
@@ -1035,6 +1258,7 @@
             if (currentQuestionIndex < questions.length) {
                 loadQuestion();
             } else {
+                resetIdleTime(); 
                 showEndScreen();
             }
         }
@@ -1098,7 +1322,6 @@
                     await wait(1000);
                     await triggerNoMultiply();
                     
-                    // 滿屏字樣消失後的黑屏期間播放特製音效
                     const sfxNo = document.getElementById('se-no');
                     if (sfxNo) {
                         sfxNo.volume = 0.8; 
