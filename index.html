@@ -421,9 +421,8 @@
             color: #ffffff !important;
         }
         body.deep-dark-mode .modal-text.warning-red {
-            color: #ff5555 !important;
-            font-weight: bold;
-            text-shadow: 0 0 1px rgba(255, 85, 85, 0.4);
+            /* 回調為預設的警告紅字 */
+            color: #ff1a1a !important;
         }
         body.deep-dark-mode .modal-box button.action-btn {
             background-color: #000000 !important;
@@ -583,7 +582,6 @@
 
     </div>
 
-    <!-- 彈出視窗 -->
     <div id="hint-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <div id="modal-content" class="modal-text"></div>
@@ -597,17 +595,14 @@
         <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
-    <!-- 閒置超時專用黑畫面 -->
     <div id="idle-blackout-screen" class="blackout-overlay hidden" style="z-index: 4500;">
         <div class="blackout-text" style="color: #ff1a1a; font-style: italic; font-size: 32px; font-weight: bold;">您在猶豫什麼呢？</div>
     </div>
 
-    <!-- 處罰畫面 -->
     <div id="red-punishment-screen" class="hidden">
         <div id="matrix-filler"></div>
     </div>
 
-    <!-- 結算畫面 -->
     <div id="true-end-screen" class="hidden">
         <div id="no-multiply-container" class="hidden"></div>
         
@@ -619,34 +614,33 @@
             </div>
         </div>
 
-        <!-- 重新開始按鈕 -->
         <div id="restart-container" class="hidden">
             <button class="action-btn" style="font-size: 16px; padding: 12px 35px;" onclick="window.location.reload()">Retry</button>
         </div>
     </div>
 
-    <!-- 背景音樂播放器 -->
     <audio id="bg-music" loop>
         <source src="The Dentist's Theme.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- 彩蛋專用音效播放器 -->
     <audio id="se-no">
         <source src="Ultraviolet Radiation.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // 閒置時間計時器
+        // 閒置時間計時器與次數統計
         let idleTime = 0;
+        let questionTimeoutCount = 0;
+        let endScreenTimeoutCount = 0;
         
         setInterval(() => {
             idleTime++;
-            const targetQuestions = [6, 7, 10, 11, 12, 13, 14]; // 第 7, 8, 11, 12, 13, 14, 15 題
+            const targetQuestions = [6, 7, 10, 11, 12, 13, 14]; // 對應第 7, 8, 11, 12, 13, 14, 15 題
             
             let isQuestionScreen = !document.getElementById('question-screen').classList.contains('hidden');
             let isEndScreen = !document.getElementById('true-end-screen').classList.contains('hidden');
             
-            // 題目畫面的超時黑屏
+            // 題目畫面的超時黑屏邏輯
             if (isQuestionScreen && targetQuestions.includes(currentQuestionIndex)) {
                 let isModalActive = !document.getElementById('hint-modal').classList.contains('hidden');
                 let isPunishActive = !document.getElementById('red-punishment-screen').classList.contains('hidden');
@@ -654,38 +648,56 @@
                 let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
                 
                 if (idleTime >= 15 && !isModalActive && !isPunishActive && !isBlackoutActive && !isIdleBlackoutActive) {
+                    questionTimeoutCount++;
                     const idleScreen = document.getElementById('idle-blackout-screen');
-                    idleScreen.classList.remove('hidden');
+                    const idleText = idleScreen.querySelector('.blackout-text');
                     
-                    // 持續3秒後消失
+                    // 根據超時次數決定文字
+                    if (questionTimeoutCount === 1) {
+                        idleText.innerText = "您在猶豫什麼呢？";
+                    } else if (questionTimeoutCount === 2) {
+                        idleText.innerText = "……";
+                    } else {
+                        idleText.innerText = "請回答我，好嗎？";
+                    }
+                    
+                    idleScreen.classList.remove('hidden');
+                    idleTime = 0; 
+                    
+                    // 持續3秒後消失，並重置計時器，以利下一次計算
                     setTimeout(() => {
                         idleScreen.classList.add('hidden');
                         idleTime = 0; 
                     }, 3000);
-                    
-                    idleTime = 0; 
                 }
             }
             
-            // 結算畫面的超時黑屏
+            // 結算畫面的超時黑屏邏輯
             if (isEndScreen && !document.getElementById('final-input').disabled) {
                 let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
                 
                 if (idleTime >= 20 && !isIdleBlackoutActive) {
+                    endScreenTimeoutCount++;
                     const idleScreen = document.getElementById('idle-blackout-screen');
                     const idleText = idleScreen.querySelector('.blackout-text');
                     
-                    idleText.innerText = "I'm still waiting your answer.";
-                    idleScreen.classList.remove('hidden');
+                    // 根據超時次數決定文字
+                    if (endScreenTimeoutCount === 1) {
+                        idleText.innerText = "I'm still waiting your answer.";
+                    } else if (endScreenTimeoutCount === 2) {
+                        idleText.innerText = "…";
+                    } else {
+                        idleText.innerText = "Don't leave alone…";
+                    }
                     
-                    // 持續3秒後返回輸入畫面
+                    idleScreen.classList.remove('hidden');
+                    idleTime = 0;
+                    
+                    // 持續3秒後返回輸入畫面，並重置計時器
                     setTimeout(() => {
                         idleScreen.classList.add('hidden');
-                        idleText.innerText = "您在猶豫什麼呢？"; // 復原為預設文字
                         idleTime = 0;
                     }, 3000);
-                    
-                    idleTime = 0;
                 }
             }
         }, 1000);
