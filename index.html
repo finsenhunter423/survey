@@ -1345,27 +1345,29 @@
             btn.disabled = true;
             document.getElementById('end-input-area').style.display = 'none';
 
+            // 修改：判定輸入內容後，全域停止播放背景音樂
+            const bgMusic = document.getElementById('bg-music');
+            if (bgMusic) {
+                bgMusic.pause();
+            }
+
             switch(val) {
                 case 'yes':
+                    // yes彩蛋修改：先維持2秒黑畫面並播放音效，再顯示文字
                     endTextEl.innerText = ""; 
                     const sfxYes = document.getElementById('se-yes');
                     if (sfxYes) {
                         sfxYes.volume = 0.8;
                         sfxYes.play().catch(e => console.log("Yes音效播放受阻:", e));
                     }
-                    await wait(1000); 
+                    await wait(2000); 
                     endTextEl.innerText = "I knew you wouldn't disappoint me."; await wait(3000);
                     endTextEl.innerText = "Look at these beautiful lenses…"; await wait(3000);
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
                 case 'no':
-                    const bgMusic = document.getElementById('bg-music');
-                    if (bgMusic) {
-                        bgMusic.pause();
-                    }
-
                     endTextEl.innerText = "Why not?";
-                    await wait(1000); 
+                    await wait(2000); // 停留時間改為2秒
                     await triggerNoMultiply(); 
                     
                     const sfxNo = document.getElementById('se-no');
