@@ -633,7 +633,7 @@
     </audio>
 
     <audio id="se-yes">
-        <source src="sneer-3.mp3" type="audio/mpeg">
+        <source src="sneer.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -1360,7 +1360,7 @@
                         sfxYes.volume = 0.8;
                         sfxYes.play().catch(e => console.log("Yes音效播放受阻:", e));
                     }
-                    await wait(2000); 
+                    await wait(4000); 
                     endTextEl.innerText = "I knew you wouldn't disappoint me."; await wait(3000);
                     endTextEl.innerText = "Look at these beautiful lenses…"; await wait(3000);
                     await showFinalEnding("Now, let's complete the legend, hum?");
