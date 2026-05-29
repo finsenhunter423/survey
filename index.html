@@ -595,7 +595,7 @@
         <div id="blackout-content" class="blackout-text">非常好……</div>
     </div>
 
-    <div id="idle-blackout-screen" class="blackout-overlay hidden" style="z-index: 6000;">
+    <div id="idle-blackout-screen" class="blackout-overlay hidden" style="z-index: 4500;">
         <div class="blackout-text" style="color: #ff1a1a; font-style: italic; font-size: 32px; font-weight: bold;">您在猶豫什麼呢？</div>
     </div>
 
@@ -625,6 +625,10 @@
 
     <audio id="se-no">
         <source src="Ultraviolet Radiation.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="se-yes">
+        <source src="您的yes音效檔案網址或路徑.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -658,7 +662,7 @@
                     } else if (questionTimeoutCount === 2) {
                         idleText.innerText = "……";
                     } else {
-                        idleText.innerText = "請回答我……。";
+                        idleText.innerText = "請回答我，好嗎？";
                     }
                     
                     idleScreen.classList.remove('hidden');
@@ -676,7 +680,7 @@
             if (isEndScreen && !document.getElementById('final-input').disabled) {
                 let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
                 
-                if (idleTime >= 15 && !isIdleBlackoutActive) {
+                if (idleTime >= 20 && !isIdleBlackoutActive) {
                     endScreenTimeoutCount++;
                     const idleScreen = document.getElementById('idle-blackout-screen');
                     const idleText = idleScreen.querySelector('.blackout-text');
@@ -712,19 +716,19 @@
 
         const questions = [
             {
-                question: "1. 您刷牙的頻率如何？",
+                question: "1. 刷牙的頻率如何？",
                 options: [{ text: "餐後刷牙" }, { text: "早/晚刷牙" }, { text: "想到才刷牙" }, { text: "幾乎不刷牙" }]
             },
             {
-                question: "2. 您刷牙時是否使用牙粉(Tooth Powder)？",
+                question: "2. 刷牙時是否使用牙粉(Tooth Powder)？",
                 options: [{ text: "每次都使用" }, { text: "偶爾使用" }, { text: "從不使用" }, { text: "……那是什麼？" }]
             },
             {
-                question: "3. 您是否使用漱口水？",
+                question: "3. 是否使用漱口水？",
                 options: [{ text: "每天使用" }, { text: "偶爾使用" }, { text: "很少使用" }, { text: "從不使用" }]
             },
             {
-                question: "4. 您是否曾罹患齲齒？",
+                question: "4. 是否曾罹患齲齒？",
                 options: [
                     { text: "從未" },
                     { text: "曾罹患，已治療" },
@@ -733,7 +737,7 @@
                 ]
             },
             {
-                question: "5. 您是否固定至牙科看診？",
+                question: "5. 是否固定至牙科看診？",
                 options: [
                     { text: "每半年一次或更多", hint: "乖孩子……", hintId: "q5_a" },
                     { text: "每年一次或更少", hint: "還能再進步呢……", hintId: "q5_b" },
@@ -742,11 +746,11 @@
                 ]
             },
             {
-                question: "6. 您是否知道什麼是「根管治療」？",
+                question: "6. 是否知道什麼是「根管治療」？",
                 options: [{ text: "十分了解" }, { text: "大概知道" }, { text: "不太清楚" }, { text: "從未聽說" }]
             },
             {
-                question: "7. 您是否相信「光療法」？",
+                question: "7. 是否相信「光療法」？",
                 isSpecialQ7: true,
                 options: [
                     { initial: "深信不疑", final: "深信不疑", hasRevealed: false }, 
@@ -756,7 +760,7 @@
                 ]
             },
             {
-                question: "8. 您是否相信我……？",
+                question: "8. 是否相信我……？",
                 isSpecialQ8: true,
                 options: [
                     { initial: "……什麼？", final: "當然" },
@@ -766,15 +770,15 @@
                 ]
             },
             {
-                question: "9. 您食用甜點或含糖飲料的頻率如何？",
+                question: "9. 食用甜點或含糖飲料的頻率如何？",
                 options: [{ text: "每天" }, { text: "經常" }, { text: "很少" }, { text: "幾乎沒有" }]
             },
             {
-                question: "10. 您是否接受過牙齒矯正？",
+                question: "10. 是否接受過牙齒矯正？",
                 options: [{ text: "正在進行" }, { text: "曾經有" }, { text: "未來計畫進行" }, { text: "不曾且無計畫接受" }]
             },
             { 
-                question: "11. 您聽說過關於沼澤的「故事」嗎？", 
+                question: "11. 聽說過關於沼澤的「故事」嗎？", 
                 isSpecialQ11: true,
                 options: [
                     { initial: "……沒有", revealed: "Long long ago, a tale was born", hasRevealed: false },
@@ -784,7 +788,7 @@
                 ] 
             },
             { 
-                question: "12. 您是否願意進入「診療室」", 
+                question: "12. 是否願意進入「診療室」", 
                 isSpecialQ12: true,
                 options: [
                     { initial: "願意", final: "願意", hasRevealed: false }, 
@@ -794,7 +798,7 @@
                 ] 
             },
             { 
-                question: "13. 您願意接受口腔檢查嗎？", 
+                question: "13. 願意接受口腔檢查嗎？", 
                 isSpecialQ13: true,
                 options: [
                     { text: "願意" }, { text: "願意" }, { text: "願意" }, { text: "願意" }
@@ -834,7 +838,7 @@
             
             const music = document.getElementById('bg-music');
             if(music) {
-                music.volume = 0.25; 
+                music.volume = 0.25; // 設定音量為 0.25
                 music.play().catch(error => {
                     console.log("瀏覽器阻擋了自動播放，需要使用者互動後才可啟動");
                 });
@@ -1335,6 +1339,14 @@
 
             switch(val) {
                 case 'yes':
+                    // yes彩蛋修改：先維持1秒黑畫面並播放音效，再顯示文字
+                    endTextEl.innerText = ""; 
+                    const sfxYes = document.getElementById('se-yes');
+                    if (sfxYes) {
+                        sfxYes.volume = 0.8;
+                        sfxYes.play().catch(e => console.log("Yes音效播放受阻:", e));
+                    }
+                    await wait(1000); // 保持1秒黑畫面
                     await showFinalEnding("Now, let's complete the legend, hum?");
                     break;
                 case 'no':
@@ -1344,8 +1356,8 @@
                     }
 
                     endTextEl.innerText = "Why not?";
-                    await wait(1000);
-                    await triggerNoMultiply();
+                    await wait(1000); // 停留時間1秒
+                    await triggerNoMultiply(); // 特效開始
                     
                     const sfxNo = document.getElementById('se-no');
                     if (sfxNo) {
@@ -1412,7 +1424,7 @@
                     endTextEl.innerText = "Don't you reject me…";
                     await wait(3000);
                     
-                    endTextEl.innerText = "Stay with me, would you?";
+                    endTextEl.innerText = "";
                     inputEl.value = '';
                     inputEl.disabled = false;
                     document.getElementById('end-input-area').style.display = 'flex';
