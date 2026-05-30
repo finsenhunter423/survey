@@ -651,12 +651,12 @@
             
             // 題目畫面的超時黑屏邏輯
             if (isQuestionScreen && targetQuestions.includes(currentQuestionIndex)) {
-                let isModalActive = !document.getElementById('hint-modal').classList.contains('hidden');
                 let isPunishActive = !document.getElementById('red-punishment-screen').classList.contains('hidden');
                 let isBlackoutActive = !document.getElementById('blackout-screen').classList.contains('hidden');
                 let isIdleBlackoutActive = !document.getElementById('idle-blackout-screen').classList.contains('hidden');
                 
-                if (idleTime >= 15 && !isModalActive && !isPunishActive && !isBlackoutActive && !isIdleBlackoutActive) {
+                // 移除 !isModalActive 的限制，讓提示框開啟時依然會計算超時並覆蓋畫面
+                if (idleTime >= 15 && !isPunishActive && !isBlackoutActive && !isIdleBlackoutActive) {
                     questionTimeoutCount++;
                     const idleScreen = document.getElementById('idle-blackout-screen');
                     const idleText = idleScreen.querySelector('.blackout-text');
