@@ -1345,7 +1345,7 @@
             btn.disabled = true;
             document.getElementById('end-input-area').style.display = 'none';
 
-            // 修改：判定輸入內容後，全域停止播放背景音樂
+            // 判定輸入內容後，全域停止播放背景音樂
             const bgMusic = document.getElementById('bg-music');
             if (bgMusic) {
                 bgMusic.pause();
@@ -1353,7 +1353,6 @@
 
             switch(val) {
                 case 'yes':
-                    // yes彩蛋修改：先維持4秒黑畫面並播放音效，再顯示文字
                     endTextEl.innerText = ""; 
                     const sfxYes = document.getElementById('se-yes');
                     if (sfxYes) {
@@ -1367,7 +1366,7 @@
                     break;
                 case 'no':
                     endTextEl.innerText = "Why not?";
-                    await wait(2000); // 停留時間改為2秒
+                    await wait(2000); 
                     await triggerNoMultiply(); 
                     
                     const sfxNo = document.getElementById('se-no');
@@ -1435,7 +1434,8 @@
                     endTextEl.innerText = "Don't you reject me…";
                     await wait(3000);
                     
-                    endTextEl.innerText = "";
+                    // 回調：將被清空的字樣重新補上
+                    endTextEl.innerText = "Stay with me, would you?";
                     inputEl.value = '';
                     inputEl.disabled = false;
                     document.getElementById('end-input-area').style.display = 'flex';
