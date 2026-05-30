@@ -832,6 +832,8 @@
         let q8WrongCount = 0; 
         let q8Timer = null;
         let q8TextsRevealed = false; 
+        let q13TextsRevealed = false; // 新增：控制第 13 題點擊旗標
+        let q15TextsRevealed = false; // 新增：控制第 15 題點擊旗標
         let disabledOptionsQ8 = [false, false, false, false];
 
         let q14ModalStage = 0;
@@ -883,6 +885,14 @@
                 questionTextEl.classList.add('warning-red');
             } else {
                 questionTextEl.classList.remove('warning-red');
+            }
+
+            // 在每次載入關卡時初始化變形旗標
+            if (currentData.isSpecialQ13) {
+                q13TextsRevealed = false;
+            }
+            if (currentData.isSpecialQ15) {
+                q15TextsRevealed = false;
             }
             
             const container = document.getElementById('options-container');
@@ -976,6 +986,10 @@
                                 btn.classList.remove('q-white-text');
                                 btn.classList.add('q-red');
                                 btn.classList.remove('glitch-active');
+                                // 當最後一個選項切換為紅字完畢，解鎖點選旗標
+                                if (index === currentData.options.length - 1) {
+                                    q13TextsRevealed = true;
+                                }
                             }, 250);
                         }
                     });
@@ -1000,6 +1014,8 @@
                         }
                     });
                     
+                    q15TextsRevealed = true; // 變形完成，解鎖點選旗標
+                    
                     setTimeout(() => {
                         document.body.classList.remove('screen-shake');
                     }, 500);
@@ -1019,6 +1035,11 @@
 
         function selectOption(index, hint, hintId) {
             const currentData = questions[currentQuestionIndex];
+            
+            // 【攔截限制】8、13、15 題未改變至最終型態前直接 return 阻擋執行（不使用 disabled 特效依然留存）
+            if (currentData.isSpecialQ8 && !q8TextsRevealed) return;
+            if (currentData.isSpecialQ13 && !q13TextsRevealed) return;
+            if (currentData.isSpecialQ15 && !q15TextsRevealed) return;
             
             if (currentData.isSpecialQ7 || currentData.isSpecialQ12) {
                 // 紀錄在此次點擊前，該選項是否已經被揭露過
